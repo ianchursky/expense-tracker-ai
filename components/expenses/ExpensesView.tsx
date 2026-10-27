@@ -1,13 +1,14 @@
 "use client";
 
-import { Download, Plus, Receipt, SearchX, Sparkles, Trash2 } from "lucide-react";
+import { ChevronDown, Database, Download, FileDown, FileUp, Plus, Receipt, SearchX, Sparkles, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
 import { useToast } from "@/components/providers/ToastProvider";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClasses } from "@/components/ui/Button";
 import { Card, Skeleton } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Menu } from "@/components/ui/Menu";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
@@ -29,8 +30,8 @@ function ListSkeleton() {
 }
 
 export function ExpensesView() {
-  const { expenses, isLoaded, loadSampleData, clearAll } = useExpenses();
-  const { openAdd, confirm } = useExpenseDialogs();
+  const { expenses, isLoaded, loadSampleData } = useExpenses();
+  const { openAdd, openImport, exportAll, requestDeleteAll } = useExpenseDialogs();
   const { toast } = useToast();
   const [filters, setFilters] = useState<ExpenseFilters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<SortState>({ field: "date", direction: "desc" });
@@ -56,22 +57,12 @@ export function ExpensesView() {
     }
   };
 
-  const handleClearAll = () =>
-    confirm({
-      title: "Delete all expenses?",
-      message: `This permanently removes all ${expenses.length} expenses from this browser. Export a CSV first if you want a backup.`,
-      confirmLabel: "Delete all",
-      onConfirm: () => {
-        clearAll();
-        toast("All expenses deleted.");
-      },
-    });
-
   const loadSample = () => {
     toast(`Loaded ${loadSampleData()} sample expenses.`, "info");
   };
 
   const hasExpenses = isLoaded && expenses.length > 0;
+  const isFiltered = visible.length !== expenses.length;
 
   return (
     <>
@@ -81,12 +72,26 @@ export function ExpensesView() {
         actions={
           hasExpenses && (
             <>
-              <Button variant="ghost" onClick={handleClearAll}>
-                <Trash2 className="h-4 w-4" aria-hidden /> Delete all
-              </Button>
               <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
-                <Download className="h-4 w-4" aria-hidden /> Export CSV
+                <Download className="h-4 w-4" aria-hidden />
+                {isFiltered ? `Export ${visible.length.toLocaleString()} shown` : "Export CSV"}
               </Button>
+              <Menu
+                label="Data"
+                triggerClassName={buttonClasses("secondary")}
+                trigger={
+                  <>
+                    <Database className="h-4 w-4" aria-hidden /> Data
+                    <ChevronDown className="h-4 w-4 text-slate-500" aria-hidden />
+                  </>
+                }
+                items={[
+                  { label: "Import CSV…", icon: FileUp, onSelect: openImport },
+                  { label: "Export all expenses", icon: FileDown, onSelect: exportAll },
+                  "separator",
+                  { label: "Delete all expenses…", icon: Trash2, danger: true, onSelect: requestDeleteAll },
+                ]}
+              />
             </>
           )
         }
@@ -103,6 +108,9 @@ export function ExpensesView() {
           >
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" aria-hidden /> Add expense
+            </Button>
+            <Button variant="secondary" onClick={openImport}>
+              <FileUp className="h-4 w-4" aria-hidden /> Import CSV
             </Button>
             <Button variant="secondary" onClick={loadSample}>
               <Sparkles className="h-4 w-4" aria-hidden /> Load sample data

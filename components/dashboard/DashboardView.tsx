@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Sparkles, Wallet } from "lucide-react";
+import { FileUp, Plus, Sparkles, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
@@ -44,7 +44,7 @@ function DashboardSkeleton() {
 
 export function DashboardView() {
   const { expenses, isLoaded, loadSampleData } = useExpenses();
-  const { openAdd } = useExpenseDialogs();
+  const { openAdd, openImport } = useExpenseDialogs();
   const { toast } = useToast();
   const [period, setPeriod] = useState<CategoryPeriod>("month");
 
@@ -74,10 +74,13 @@ export function DashboardView() {
           <EmptyState
             icon={Wallet}
             title="No expenses yet"
-            description="Add your first expense to start seeing summaries and charts, or load sample data to explore the app."
+            description="Add your first expense, restore a CSV backup, or load sample data to explore the app."
           >
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" aria-hidden /> Add expense
+            </Button>
+            <Button variant="secondary" onClick={openImport}>
+              <FileUp className="h-4 w-4" aria-hidden /> Import CSV
             </Button>
             <Button variant="secondary" onClick={loadSample}>
               <Sparkles className="h-4 w-4" aria-hidden /> Load sample data

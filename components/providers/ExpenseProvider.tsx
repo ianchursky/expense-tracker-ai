@@ -18,8 +18,13 @@ interface ExpenseContextValue {
   hasSampleData: boolean;
   updateExpense: (id: string, input: ExpenseInput) => void;
   deleteExpense: (id: string) => Expense | undefined;
-  restoreExpense: (expense: Expense) => void;
-  clearAll: () => void;
+  /** Puts previously removed expenses back (Undo). Ids already present are ignored. */
+  restoreExpenses: (expenses: Expense[]) => void;
+  /** Adds imported expenses. Returns them, or null when they could not be saved (nothing is changed then). */
+  importExpenses: (inputs: ExpenseInput[]) => Expense[] | null;
+  removeExpenses: (ids: string[]) => void;
+  /** Deletes everything and returns what was removed, for Undo. */
+  clearAll: () => Expense[];
 }
 
 const ExpenseContext = createContext<ExpenseContextValue | null>(null);
@@ -68,12 +73,14 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", onStorage);
   }, [replace, toast]);
 
+  /** Updates state and persists; returns the storage error message, if any. */
   const commit = useCallback(
     (next: Expense[]) => {
       replace(next);
       const error = saveExpenses(next);
       setStorageError(error);
       if (error) toast(error, "error");
+      return error;
     },
     [replace, toast],
   );
@@ -119,15 +126,43 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
-  const restoreExpense = useCallback(
-    (expense: Expense) => {
-      if (expensesRef.current.some((e) => e.id === expense.id)) return;
-      commit([expense, ...expensesRef.current]);
+  const restoreExpenses = useCallback(
+    (restored: Expense[]) => {
+      const present = new Set(expensesRef.current.map((e) => e.id));
+      const missing = restored.filter((e) => !present.has(e.id));
+      if (missing.length) commit([...missing, ...expensesRef.current]);
     },
     [commit],
   );
 
-  const clearAll = useCallback(() => commit([]), [commit]);
+  const importExpenses = useCallback(
+    (inputs: ExpenseInput[]) => {
+      const previous = expensesRef.current;
+      const imported = inputs.map((input) => buildExpense(input));
+      if (commit([...imported, ...previous])) {
+        // Storage rejected it (usually quota): roll back so the screen matches what will survive a reload.
+        replace(previous);
+        setStorageError(null);
+        return null;
+      }
+      return imported;
+    },
+    [commit, replace],
+  );
+
+  const removeExpenses = useCallback(
+    (ids: string[]) => {
+      const drop = new Set(ids);
+      commit(expensesRef.current.filter((e) => !drop.has(e.id)));
+    },
+    [commit],
+  );
+
+  const clearAll = useCallback(() => {
+    const removed = expensesRef.current;
+    commit([]);
+    return removed;
+  }, [commit]);
 
   const value = useMemo(
     () => ({
@@ -140,10 +175,26 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       hasSampleData,
       updateExpense,
       deleteExpense,
-      restoreExpense,
+      restoreExpenses,
+      importExpenses,
+      removeExpenses,
       clearAll,
     }),
-    [expenses, isLoaded, storageError, addExpense, loadSampleData, removeSampleData, hasSampleData, updateExpense, deleteExpense, restoreExpense, clearAll],
+    [
+      expenses,
+      isLoaded,
+      storageError,
+      addExpense,
+      loadSampleData,
+      removeSampleData,
+      hasSampleData,
+      updateExpense,
+      deleteExpense,
+      restoreExpenses,
+      importExpenses,
+      removeExpenses,
+      clearAll,
+    ],
   );
 
   return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;

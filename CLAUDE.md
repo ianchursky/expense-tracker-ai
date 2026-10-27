@@ -35,6 +35,7 @@ Next.js 14 App Router + TypeScript + Tailwind; client-only data stored in `local
 - The storage key is versioned (`expense-tracker:expenses:v1`). If you change the `Expense` shape, bump the key or add a migration in `storage.ts`, because `isExpense()` silently drops records that don't match.
 - Modals use the native `<dialog>` element (`components/ui/Modal.tsx`), which renders in the browser top layer above toasts.
 - Charts use Recharts (`components/dashboard/*Chart*`, `CategoryBreakdown`). They must stay in `"use client"` components and pass `isAnimationActive={!usePrefersReducedMotion()}`.
+- CSV import (`lib/csvImport.ts`) must keep reading whatever `expensesToCSV` writes. It validates rows with `validateExpenseForm`, reports bad rows by line, and skips duplicates count-for-count against existing data (two identical rows inside one file both import). The import, Export all, and Delete all actions live in `ExpenseDialogProvider` (`openImport`, `exportAll`, `requestDeleteAll`). Bulk changes go through `importExpenses`, `removeExpenses`, and `restoreExpenses` so Undo works.
 - Generated demo expenses have ids prefixed `sample-` (see `ExpenseProvider`'s `loadSampleData`, `removeSampleData` and `hasSampleData`). `SampleDataNotice` labels them; don't add a stored "sample" field.
 
 ## Design

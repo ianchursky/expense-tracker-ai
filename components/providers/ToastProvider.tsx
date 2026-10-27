@@ -30,27 +30,54 @@ const ICON_CLASSES = { success: "text-brand-600", error: "text-red-600", info: "
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextId = useRef(0);
-  const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  // Each toast tracks its remaining time so the countdown can pause while the user hovers or focuses it
+  // (an Undo that vanishes mid-reach fails WCAG 2.2.1, Timing Adjustable).
+  const timers = useRef(new Map<number, { handle?: ReturnType<typeof setTimeout>; deadline: number; remaining: number }>());
+  const paused = useRef(false);
 
   const dismiss = useCallback((id: number) => {
     setToasts((current) => current.filter((t) => t.id !== id));
-    clearTimeout(timers.current.get(id));
+    clearTimeout(timers.current.get(id)?.handle);
     timers.current.delete(id);
   }, []);
+
+  const start = useCallback(
+    (id: number, ms: number) => {
+      timers.current.set(id, { handle: setTimeout(() => dismiss(id), ms), deadline: Date.now() + ms, remaining: ms });
+    },
+    [dismiss],
+  );
+
+  const pause = useCallback(() => {
+    if (paused.current) return;
+    paused.current = true;
+    timers.current.forEach((t) => {
+      clearTimeout(t.handle);
+      t.handle = undefined;
+      t.remaining = Math.max(t.deadline - Date.now(), 1500);
+    });
+  }, []);
+
+  const resume = useCallback(() => {
+    if (!paused.current) return;
+    paused.current = false;
+    timers.current.forEach((t, id) => start(id, t.remaining));
+  }, [start]);
 
   const toast = useCallback(
     (message: string, variant: ToastVariant = "success", action?: ToastAction) => {
       const id = nextId.current++;
       setToasts((current) => [...current.slice(-3), { id, message, variant, action }]);
       const duration = variant === "error" || action ? 6000 : 3500;
-      timers.current.set(id, setTimeout(() => dismiss(id), duration));
+      if (paused.current) timers.current.set(id, { deadline: Date.now() + duration, remaining: duration });
+      else start(id, duration);
     },
-    [dismiss],
+    [start],
   );
 
   useEffect(() => {
     const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
+    return () => pending.forEach((t) => clearTimeout(t.handle));
   }, []);
 
   const value = useMemo(() => ({ toast }), [toast]);
@@ -58,8 +85,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
+      {/* Each toast is its own status/alert live region, so the container must not be one too. */}
       <div
-        aria-live="polite"
+        onMouseEnter={pause}
+        onMouseLeave={resume}
+        onFocus={pause}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) resume();
+        }}
         className="pointer-events-none fixed inset-x-0 bottom-20 z-[60] flex flex-col items-center gap-2 p-4 sm:items-end sm:p-6 lg:bottom-0"
       >
         {toasts.map((t) => {
