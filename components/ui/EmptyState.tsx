@@ -14,7 +14,7 @@ export function EmptyState({ icon: Icon, title, description, children }: EmptySt
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
         <Icon className="h-6 w-6" aria-hidden />
       </span>
-      <h3 className="mt-4 text-base font-semibold text-slate-900">{title}</h3>
+      <h3 className="mt-4 max-w-md break-words text-base font-semibold text-slate-900">{title}</h3>
       <p className="mt-1 max-w-sm text-sm text-slate-500">{description}</p>
       {children && <div className="mt-6 flex flex-wrap justify-center gap-3">{children}</div>}
     </div>

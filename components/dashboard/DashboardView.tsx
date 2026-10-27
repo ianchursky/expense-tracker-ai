@@ -74,7 +74,7 @@ export function DashboardView() {
           <EmptyState
             icon={Wallet}
             title="No expenses yet"
-            description="Add your first expense, restore a CSV backup, or load sample data to explore the app."
+            description="No account needed: everything you enter stays in this browser. Add your first expense, restore a CSV backup, or load sample data to look around."
           >
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" aria-hidden /> Add expense

@@ -64,6 +64,19 @@ export function formatMonthKey(key: string, style: "short" | "long" = "short"): 
   );
 }
 
+/** Compact inclusive range: "Sep 1–27" within one month, otherwise "Sep 28 – Oct 3". */
+export function formatShortRange(startDate: string, endDate: string): string {
+  const start = parseISODate(startDate);
+  const end = parseISODate(endDate);
+  const month = (d: Date) => d.toLocaleDateString("en-US", { month: "short" });
+  if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
+    return start.getDate() === end.getDate()
+      ? `${month(start)} ${start.getDate()}`
+      : `${month(start)} ${start.getDate()}–${end.getDate()}`;
+  }
+  return `${month(start)} ${start.getDate()} – ${month(end)} ${end.getDate()}`;
+}
+
 export function roundToCents(amount: number): number {
   return Math.round(amount * 100) / 100;
 }

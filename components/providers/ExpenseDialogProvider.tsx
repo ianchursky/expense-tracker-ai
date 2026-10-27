@@ -63,7 +63,7 @@ function BackupFirst({ onExport, count }: { onExport: () => void; count: number 
 
 /** Owns the app-wide add/edit, import, and confirmation dialogs so any page or the navbar can open them. */
 export function ExpenseDialogProvider({ children }: { children: ReactNode }) {
-  const { expenses, addExpense, updateExpense, deleteExpense, restoreExpenses, clearAll } = useExpenses();
+  const { expenses, addExpense, updateExpense, deleteExpense, restoreExpenses, clearAll, markBackedUp } = useExpenses();
   const { toast } = useToast();
   const [form, setForm] = useState<FormState>(null);
   const [importOpen, setImportOpen] = useState(false);
@@ -101,11 +101,12 @@ export function ExpenseDialogProvider({ children }: { children: ReactNode }) {
   const exportAll = useCallback(() => {
     try {
       downloadCSV(`expenses-backup-${todayISO()}.csv`, expensesToCSV(expenses));
+      markBackedUp();
       toast(`Exported ${plural(expenses.length, "expense")} to CSV.`);
     } catch {
       toast("Export failed. Please try again.", "error");
     }
-  }, [expenses, toast]);
+  }, [expenses, markBackedUp, toast]);
 
   const requestDeleteAll = useCallback(
     () =>
@@ -171,7 +172,7 @@ export function ExpenseDialogProvider({ children }: { children: ReactNode }) {
         open={importOpen}
         onClose={closeImport}
         title="Import expenses"
-        description="Restore a backup or bring in expenses from a spreadsheet."
+        description="Restore a backup or bring in expenses from a spreadsheet. The file is read on this device and never uploaded."
       >
         {importOpen && <ImportDialog onClose={closeImport} />}
       </Modal>

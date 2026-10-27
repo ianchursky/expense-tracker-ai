@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { Button } from "@/components/ui/Button";
+import { StorageStatus } from "./StorageStatus";
 
 const LINKS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -62,6 +63,9 @@ export function Navbar() {
             );
           })}
         </nav>
+        <div className="mt-auto">
+          <StorageStatus variant="sidebar" />
+        </div>
       </aside>
 
       <header className="sticky top-0 z-40 flex h-14 items-center border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:hidden">

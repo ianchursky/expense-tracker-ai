@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { BACKUP_KEY, loadBackup, parseBackup, saveBackup, type BackupRecord } from "@/lib/backup";
 import { createId, loadExpenses, parseStoredExpenses, saveExpenses, STORAGE_KEY } from "@/lib/storage";
 import { generateSampleExpenses } from "@/lib/sampleData";
 import type { Expense, ExpenseInput } from "@/lib/types";
@@ -25,6 +26,12 @@ interface ExpenseContextValue {
   removeExpenses: (ids: string[]) => void;
   /** Deletes everything and returns what was removed, for Undo. */
   clearAll: () => Expense[];
+  /** Last time every expense was exported to CSV, or null if never. */
+  lastBackup: BackupRecord | null;
+  /** Expenses added or edited since that backup (deletions aren't tracked). */
+  changesSinceBackup: number;
+  /** Record that all current expenses were just exported. */
+  markBackedUp: () => void;
 }
 
 const ExpenseContext = createContext<ExpenseContextValue | null>(null);
@@ -43,6 +50,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [lastBackup, setLastBackup] = useState<BackupRecord | null>(null);
   // Mirror of state so mutations can compute the next list synchronously and persist it once.
   const expensesRef = useRef<Expense[]>([]);
   // StrictMode runs effects twice in development; only report load problems once.
@@ -57,6 +65,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     const result = loadExpenses();
     replace(result.expenses);
     setStorageError(result.error ?? null);
+    setLastBackup(loadBackup());
     setIsLoaded(true);
     if (!loadReported.current) {
       loadReported.current = true;
@@ -66,8 +75,8 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
     // Keep multiple open tabs in sync.
     const onStorage = (event: StorageEvent) => {
-      if (event.key !== STORAGE_KEY) return;
-      replace(parseStoredExpenses(event.newValue).expenses);
+      if (event.key === STORAGE_KEY) replace(parseStoredExpenses(event.newValue).expenses);
+      else if (event.key === BACKUP_KEY) setLastBackup(parseBackup(event.newValue));
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -164,6 +173,17 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     return removed;
   }, [commit]);
 
+  const markBackedUp = useCallback(() => {
+    const record = { at: new Date().toISOString(), count: expensesRef.current.length };
+    saveBackup(record);
+    setLastBackup(record);
+  }, []);
+
+  const changesSinceBackup = useMemo(
+    () => (lastBackup ? expenses.filter((e) => e.updatedAt > lastBackup.at).length : expenses.length),
+    [expenses, lastBackup],
+  );
+
   const value = useMemo(
     () => ({
       expenses,
@@ -179,6 +199,9 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       importExpenses,
       removeExpenses,
       clearAll,
+      lastBackup,
+      changesSinceBackup,
+      markBackedUp,
     }),
     [
       expenses,
@@ -194,6 +217,9 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       importExpenses,
       removeExpenses,
       clearAll,
+      lastBackup,
+      changesSinceBackup,
+      markBackedUp,
     ],
   );
 

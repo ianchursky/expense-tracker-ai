@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
+import { StorageStatus } from "@/components/layout/StorageStatus";
 import { StorageWarning } from "@/components/layout/StorageWarning";
 import { ExpenseDialogProvider } from "@/components/providers/ExpenseDialogProvider";
 import { ExpenseProvider } from "@/components/providers/ExpenseProvider";
@@ -35,6 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <StorageWarning />
                   <SampleDataNotice />
                   {children}
+                  <div className="mt-8 lg:hidden">
+                    <StorageStatus variant="inline" />
+                  </div>
                 </main>
               </div>
             </ExpenseDialogProvider>

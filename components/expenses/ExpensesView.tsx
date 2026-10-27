@@ -12,7 +12,7 @@ import { Menu } from "@/components/ui/Menu";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
-import { formatCurrency, todayISO } from "@/lib/format";
+import { formatCurrency, formatDate, todayISO } from "@/lib/format";
 import type { ExpenseFilters, SortState } from "@/lib/types";
 import { ExpenseFiltersBar } from "./ExpenseFiltersBar";
 import { ExpenseList } from "./ExpenseList";
@@ -27,6 +27,29 @@ function ListSkeleton() {
       ))}
     </div>
   );
+}
+
+/** Empty-results copy that repeats back exactly what was searched, so the next step is obvious. */
+function describeNoResults(filters: ExpenseFilters): { title: string; description: string } {
+  const query = filters.search.trim();
+  const what = filters.category === "All" ? "all expenses" : `${filters.category} expenses`;
+  const { startDate, endDate } = filters;
+  const when =
+    startDate && endDate
+      ? ` from ${formatDate(startDate)} to ${formatDate(endDate)}`
+      : startDate
+        ? ` from ${formatDate(startDate)} on`
+        : endDate
+          ? ` through ${formatDate(endDate)}`
+          : "";
+  const narrowed = filters.category !== "All" || when !== "";
+
+  const searched = query || narrowed ? `Searched ${what}${when}. ` : "";
+  const hint = query ? "Check the spelling or try a shorter search" : "Try a different category or date range";
+  return {
+    title: query ? `No expenses match “${query}”` : "No matching expenses",
+    description: `${searched}${hint}${narrowed && query ? ", or clear the filters." : "."}`,
+  };
 }
 
 export function ExpensesView() {
@@ -49,6 +72,8 @@ export function ExpensesView() {
   };
 
   const handleExport = () => {
+    // An unfiltered export is a full backup; route it through exportAll so the backup status updates.
+    if (visible.length === expenses.length) return exportAll();
     try {
       downloadCSV(`expenses-${todayISO()}.csv`, expensesToCSV(visible));
       toast(`Exported ${visible.length} expense${visible.length === 1 ? "" : "s"} to CSV.`);
@@ -62,6 +87,7 @@ export function ExpensesView() {
   };
 
   const hasExpenses = isLoaded && expenses.length > 0;
+  const noResults = describeNoResults(filters);
   const isFiltered = visible.length !== expenses.length;
 
   return (
@@ -135,8 +161,8 @@ export function ExpensesView() {
             {visible.length === 0 ? (
               <EmptyState
                 icon={SearchX}
-                title="No matching expenses"
-                description="Try a different search term, category, or date range."
+                title={noResults.title}
+                description={noResults.description}
               >
                 <Button variant="secondary" onClick={() => changeFilters(DEFAULT_FILTERS)}>
                   Clear filters
