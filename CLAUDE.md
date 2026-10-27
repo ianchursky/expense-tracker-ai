@@ -34,4 +34,11 @@ Next.js 14 App Router + TypeScript + Tailwind; client-only data stored in `local
 - Per-category colors, icons, and Tailwind classes live in `CATEGORY_META` (`lib/categories.ts`). Class names there must be complete literal strings so Tailwind's content scan picks them up. Adding a category means updating `CATEGORIES` and `CATEGORY_META`.
 - The storage key is versioned (`expense-tracker:expenses:v1`). If you change the `Expense` shape, bump the key or add a migration in `storage.ts`, because `isExpense()` silently drops records that don't match.
 - Modals use the native `<dialog>` element (`components/ui/Modal.tsx`), which renders in the browser top layer above toasts.
-- Charts use Recharts (`components/dashboard/*Chart*`, `CategoryBreakdown`). They must stay in `"use client"` components.
+- Charts use Recharts (`components/dashboard/*Chart*`, `CategoryBreakdown`). They must stay in `"use client"` components and pass `isAnimationActive={!usePrefersReducedMotion()}`.
+- Generated demo expenses have ids prefixed `sample-` (see `ExpenseProvider`'s `loadSampleData`, `removeSampleData` and `hasSampleData`). `SampleDataNotice` labels them; don't add a stored "sample" field.
+
+## Design
+
+- `PRODUCT.md` holds product truth and `DESIGN.md` (with `.impeccable/design.json`) holds the visual system: the category-standard finance dashboard at Monarch Money's craft level. Read `DESIGN.md` before UI work.
+- Green (`brand-*` in `tailwind.config.ts`; `brand-600` for actions and text, `brand-500` for chart fills only) is reserved for primary actions, active nav, and "spending went down". Category hues are for data and chips only, which is why Bills is indigo.
+- Layout shell (`components/layout/Navbar.tsx`): a fixed 240px sidebar from `lg` up; below that, a top bar plus a bottom tab bar with a raised Add button. Page content sits inside `lg:pl-60`, with bottom padding that clears the tab bar.

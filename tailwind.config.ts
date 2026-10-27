@@ -5,13 +5,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Green accent. 600 is the action color (white text passes 5:1); 500 is for fills/data only.
         brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
+          50: "#f0fdf4",
+          100: "#dcfce7",
+          200: "#bbf7d0",
+          500: "#16a34a",
+          600: "#15803d",
+          700: "#166534",
         },
       },
       fontFamily: {

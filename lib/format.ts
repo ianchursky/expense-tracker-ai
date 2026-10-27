@@ -55,12 +55,13 @@ export function monthKey(value: string): string {
   return value.slice(0, 7);
 }
 
+/** "short" → "May" (chart ticks; the year lives in the tooltip), "long" → "May 2026". */
 export function formatMonthKey(key: string, style: "short" | "long" = "short"): string {
   const [year, month] = key.split("-").map(Number);
-  return new Date(year, month - 1, 1).toLocaleDateString("en-US", {
-    month: style,
-    year: style === "long" ? "numeric" : "2-digit",
-  });
+  return new Date(year, month - 1, 1).toLocaleDateString(
+    "en-US",
+    style === "long" ? { month: "long", year: "numeric" } : { month: "short" },
+  );
 }
 
 export function roundToCents(amount: number): number {

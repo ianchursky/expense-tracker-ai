@@ -12,7 +12,7 @@ interface ExpenseFiltersBarProps {
 }
 
 const controlClass =
-  "block w-full rounded-lg border-0 py-2 text-sm text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-600";
+  "block w-full rounded-lg border-0 py-2 text-sm text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-600";
 
 export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps) {
   const id = useId();
@@ -39,7 +39,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             Search expenses
           </label>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden />
             <input
               id={`${id}-search`}
               type="search"
@@ -59,7 +59,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             id={`${id}-category`}
             value={filters.category}
             onChange={(e) => update({ category: e.target.value as Category | "All" })}
-            className={clsx(controlClass, "pl-3 pr-8")}
+            className={clsx(controlClass, "select-chevron pl-3 pr-9")}
           >
             <option value="All">All categories</option>
             {CATEGORIES.map((c) => (
@@ -83,7 +83,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             value={filters.startDate}
             max={filters.endDate || undefined}
             onChange={(e) => update({ startDate: e.target.value })}
-            className={clsx(controlClass, "px-3", rangeInvalid && "ring-red-300")}
+            className={clsx(controlClass, "px-3", !filters.startDate && "!text-slate-500", rangeInvalid && "ring-red-300")}
           />
         </div>
 
@@ -100,7 +100,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             value={filters.endDate}
             min={filters.startDate || undefined}
             onChange={(e) => update({ endDate: e.target.value })}
-            className={clsx(controlClass, "px-3", rangeInvalid && "ring-red-300")}
+            className={clsx(controlClass, "px-3", !filters.endDate && "!text-slate-500", rangeInvalid && "ring-red-300")}
           />
         </div>
       </div>

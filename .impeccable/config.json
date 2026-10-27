@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-27T20:37:43.473Z",
+        "reason": "Claude: flagged element is the 6-month column chart; bars sit on the x-axis baseline by design"
+      },
+      {
+        "rule": "overused-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-10-27T20:37:43.675Z",
+        "reason": "Claude: canon card deliberately depicts the category-standard finance dashboard, Inter included"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-27T21:27:20.448Z",
+        "reason": "Claude: unchosen decision-round sketch of an alternate world; its font is intentionally outside DESIGN.md"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-10-27T21:27:20.663Z",
+        "reason": "Claude: unchosen decision-round sketch of an alternate world; its font is intentionally outside DESIGN.md"
+      }
+    ]
+  }
+}

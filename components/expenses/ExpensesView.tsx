@@ -12,7 +12,6 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
 import { formatCurrency, todayISO } from "@/lib/format";
-import { generateSampleExpenses } from "@/lib/sampleData";
 import type { ExpenseFilters, SortState } from "@/lib/types";
 import { ExpenseFiltersBar } from "./ExpenseFiltersBar";
 import { ExpenseList } from "./ExpenseList";
@@ -30,7 +29,7 @@ function ListSkeleton() {
 }
 
 export function ExpensesView() {
-  const { expenses, isLoaded, addExpenses, clearAll } = useExpenses();
+  const { expenses, isLoaded, loadSampleData, clearAll } = useExpenses();
   const { openAdd, confirm } = useExpenseDialogs();
   const { toast } = useToast();
   const [filters, setFilters] = useState<ExpenseFilters>(DEFAULT_FILTERS);
@@ -69,9 +68,7 @@ export function ExpensesView() {
     });
 
   const loadSample = () => {
-    const sample = generateSampleExpenses();
-    addExpenses(sample);
-    toast(`Loaded ${sample.length} sample expenses.`, "info");
+    toast(`Loaded ${loadSampleData()} sample expenses.`, "info");
   };
 
   const hasExpenses = isLoaded && expenses.length > 0;

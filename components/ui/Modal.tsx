@@ -36,7 +36,7 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
+      className="w-[calc(100%-2rem)] max-w-lg rounded-xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
     >
       {open && (
         <div className="p-5 sm:p-6">
@@ -50,7 +50,7 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
             <button
               type="button"
               onClick={onClose}
-              className="-mr-1 -mt-1 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              className="-mr-1 -mt-1 rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-600"
               aria-label="Close dialog"
             >
               <X className="h-5 w-5" />

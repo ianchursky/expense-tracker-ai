@@ -89,6 +89,15 @@ export function ExpenseDialogProvider({ children }: { children: ReactNode }) {
             initial={form.mode === "edit" ? form.expense : undefined}
             onSubmit={handleSubmit}
             onCancel={closeForm}
+            onDelete={
+              form.mode === "edit"
+                ? () => {
+                    const { expense } = form;
+                    setForm(null);
+                    requestDelete(expense);
+                  }
+                : undefined
+            }
           />
         )}
       </Modal>

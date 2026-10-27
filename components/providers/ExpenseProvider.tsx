@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createId, loadExpenses, parseStoredExpenses, saveExpenses, STORAGE_KEY } from "@/lib/storage";
+import { generateSampleExpenses } from "@/lib/sampleData";
 import type { Expense, ExpenseInput } from "@/lib/types";
 import { useToast } from "./ToastProvider";
 
@@ -11,7 +12,10 @@ interface ExpenseContextValue {
   isLoaded: boolean;
   storageError: string | null;
   addExpense: (input: ExpenseInput) => Expense;
-  addExpenses: (inputs: ExpenseInput[]) => void;
+  /** Adds generated demo expenses; returns how many were added. */
+  loadSampleData: () => number;
+  removeSampleData: () => number;
+  hasSampleData: boolean;
   updateExpense: (id: string, input: ExpenseInput) => void;
   deleteExpense: (id: string) => Expense | undefined;
   restoreExpense: (expense: Expense) => void;
@@ -20,9 +24,13 @@ interface ExpenseContextValue {
 
 const ExpenseContext = createContext<ExpenseContextValue | null>(null);
 
-function buildExpense(input: ExpenseInput): Expense {
+// Sample expenses are marked by id prefix so they can be labeled and removed without changing the stored shape.
+const SAMPLE_PREFIX = "sample-";
+const isSample = (e: Expense) => e.id.startsWith(SAMPLE_PREFIX);
+
+function buildExpense(input: ExpenseInput, idPrefix = ""): Expense {
   const now = new Date().toISOString();
-  return { ...input, id: createId(), createdAt: now, updatedAt: now };
+  return { ...input, id: idPrefix + createId(), createdAt: now, updatedAt: now };
 }
 
 export function ExpenseProvider({ children }: { children: ReactNode }) {
@@ -79,10 +87,20 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
-  const addExpenses = useCallback(
-    (inputs: ExpenseInput[]) => commit([...inputs.map(buildExpense), ...expensesRef.current]),
-    [commit],
-  );
+  const loadSampleData = useCallback(() => {
+    const sample = generateSampleExpenses().map((input) => buildExpense(input, SAMPLE_PREFIX));
+    commit([...sample, ...expensesRef.current]);
+    return sample.length;
+  }, [commit]);
+
+  const removeSampleData = useCallback(() => {
+    const kept = expensesRef.current.filter((e) => !isSample(e));
+    const removed = expensesRef.current.length - kept.length;
+    commit(kept);
+    return removed;
+  }, [commit]);
+
+  const hasSampleData = useMemo(() => expenses.some(isSample), [expenses]);
 
   const updateExpense = useCallback(
     (id: string, input: ExpenseInput) =>
@@ -117,13 +135,15 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       isLoaded,
       storageError,
       addExpense,
-      addExpenses,
+      loadSampleData,
+      removeSampleData,
+      hasSampleData,
       updateExpense,
       deleteExpense,
       restoreExpense,
       clearAll,
     }),
-    [expenses, isLoaded, storageError, addExpense, addExpenses, updateExpense, deleteExpense, restoreExpense, clearAll],
+    [expenses, isLoaded, storageError, addExpense, loadSampleData, removeSampleData, hasSampleData, updateExpense, deleteExpense, restoreExpense, clearAll],
   );
 
   return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;

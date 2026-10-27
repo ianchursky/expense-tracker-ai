@@ -25,7 +25,7 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const ICONS = { success: CheckCircle2, error: XCircle, info: Info };
-const ICON_CLASSES = { success: "text-emerald-500", error: "text-red-500", info: "text-brand-500" };
+const ICON_CLASSES = { success: "text-brand-600", error: "text-red-600", info: "text-slate-500" };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -60,7 +60,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex flex-col items-center gap-2 p-4 sm:items-end sm:p-6"
+        className="pointer-events-none fixed inset-x-0 bottom-20 z-[60] flex flex-col items-center gap-2 p-4 sm:items-end sm:p-6 lg:bottom-0"
       >
         {toasts.map((t) => {
           const Icon = ICONS[t.variant];
@@ -68,7 +68,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               role={t.variant === "error" ? "alert" : "status"}
-              className="pointer-events-auto flex w-full max-w-sm animate-slide-in items-start gap-3 rounded-xl bg-white p-4 shadow-lg ring-1 ring-slate-900/10"
+              className="pointer-events-auto flex w-full max-w-sm animate-slide-in items-start motion-reduce:animate-none gap-3 rounded-xl bg-white p-4 shadow-lg ring-1 ring-slate-900/10"
             >
               <Icon className={clsx("mt-0.5 h-5 w-5 shrink-0", ICON_CLASSES[t.variant])} aria-hidden />
               <p className="flex-1 text-sm font-medium text-slate-800">{t.message}</p>
@@ -87,7 +87,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => dismiss(t.id)}
-                className="rounded-md p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-md p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Dismiss notification"
               >
                 <X className="h-4 w-4" />
