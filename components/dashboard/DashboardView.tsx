@@ -1,6 +1,7 @@
 "use client";
 
 import { FileUp, Plus, Sparkles, Wallet } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
@@ -12,10 +13,19 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { getDashboardSummary, monthlyTotals, sortExpenses, totalsByCategory } from "@/lib/analytics";
 import { monthKey, todayISO } from "@/lib/format";
-import { CategoryBreakdown } from "./CategoryBreakdown";
-import { MonthlyTrendChart } from "./MonthlyTrendChart";
 import { RecentExpenses } from "./RecentExpenses";
 import { SummaryCards } from "./SummaryCards";
+
+// Recharts is most of this page's JavaScript; load it after the summary and transactions render.
+// The placeholders match each card's footprint so nothing shifts when the charts arrive.
+const MonthlyTrendChart = dynamic(() => import("./MonthlyTrendChart").then((m) => m.MonthlyTrendChart), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 rounded-xl lg:col-span-3" />,
+});
+const CategoryBreakdown = dynamic(() => import("./CategoryBreakdown").then((m) => m.CategoryBreakdown), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 rounded-xl lg:col-span-2" />,
+});
 
 type CategoryPeriod = "month" | "all";
 

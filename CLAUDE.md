@@ -43,5 +43,6 @@ Next.js 14 App Router + TypeScript + Tailwind; client-only data stored in `local
 ## Design
 
 - `PRODUCT.md` holds product truth and `DESIGN.md` (with `.impeccable/design.json`) holds the visual system: the category-standard finance dashboard at Monarch Money's craft level. Read `DESIGN.md` before UI work.
+- Raw token values live in `lib/theme.ts` (brand scale, chart colors, `shadow-popover`, `shadow-menu`, `shadow-fab`). `tailwind.config.ts` imports them, and code that can't use classes (Recharts props, the viewport `themeColor`) imports them directly, so don't hard-code hex values in components.
 - Green (`brand-*` in `tailwind.config.ts`; `brand-600` for actions and text, `brand-500` for chart fills only) is reserved for primary actions, active nav, and "spending went down". Category hues are for data and chips only, which is why Bills is indigo.
 - Layout shell (`components/layout/Navbar.tsx`): a fixed 240px sidebar from `lg` up; below that, a top bar plus a bottom tab bar with a raised Add button. Page content sits inside `lg:pl-60`, with bottom padding that clears the tab bar.

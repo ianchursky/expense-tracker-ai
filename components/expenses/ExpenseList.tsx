@@ -65,11 +65,13 @@ function MobileRow({ expense: e }: { expense: Expense }) {
     <button
       type="button"
       onClick={() => openEdit(e)}
-      aria-label={`Edit ${e.description}, ${formatCurrency(e.amount)}`}
       className="flex min-h-[60px] w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-slate-50 focus-visible:-outline-offset-2"
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-slate-900">{e.description}</p>
+        <p className="truncate text-sm font-medium text-slate-900">
+          <span className="sr-only">Edit </span>
+          {e.description}
+        </p>
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-600">
           <span
             className="h-2 w-2 shrink-0 rounded-full"

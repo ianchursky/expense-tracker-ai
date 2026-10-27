@@ -12,7 +12,7 @@ interface ExpenseFiltersBarProps {
 }
 
 const controlClass =
-  "block w-full rounded-lg border-0 py-2 text-sm text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-600";
+  "block w-full rounded-lg border-0 py-2 text-base text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 sm:text-sm focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-600";
 
 export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps) {
   const id = useId();
@@ -73,7 +73,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         <div className="relative">
           <label
             htmlFor={`${id}-start`}
-            className="absolute -top-2 left-2 z-10 bg-white px-1 text-[11px] font-medium text-slate-500"
+            className="absolute -top-2 left-2 z-10 bg-white px-1 text-xs font-medium leading-none text-slate-500"
           >
             From
           </label>
@@ -90,7 +90,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         <div className="relative">
           <label
             htmlFor={`${id}-end`}
-            className="absolute -top-2 left-2 z-10 bg-white px-1 text-[11px] font-medium text-slate-500"
+            className="absolute -top-2 left-2 z-10 bg-white px-1 text-xs font-medium leading-none text-slate-500"
           >
             To
           </label>
@@ -115,7 +115,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             aria-pressed={activePreset === preset.id}
             onClick={() => update(presetRange(preset.id))}
             className={clsx(
-              "rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset transition-colors",
+              "inline-flex min-h-11 items-center rounded-full px-3.5 text-xs font-medium ring-1 ring-inset transition-colors sm:min-h-0 sm:px-3 sm:py-1",
               activePreset === preset.id
                 ? "bg-brand-600 text-white ring-brand-600"
                 : "bg-white text-slate-600 ring-slate-300 hover:bg-slate-50",
@@ -128,7 +128,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
           <button
             type="button"
             onClick={() => onChange(DEFAULT_FILTERS)}
-            className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+            className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-800 sm:min-h-0 sm:py-1"
           >
             <X className="h-3.5 w-3.5" aria-hidden /> Clear filters
           </button>

@@ -13,7 +13,7 @@ function StatCard({ label, value, footer }: { label: string; value: ReactNode; f
       <p className="mt-1.5 truncate text-2xl font-semibold leading-tight tracking-tight text-slate-900 tabular-nums sm:text-[26px]">
         {value}
       </p>
-      <div className="mt-1 truncate text-[13px] text-slate-600 sm:text-sm">{footer}</div>
+      <div className="mt-1 truncate text-xs text-slate-600 sm:text-sm">{footer}</div>
     </Card>
   );
 }
@@ -82,7 +82,7 @@ export function SummaryCards({ summary }: { summary: DashboardSummary }) {
           topCategory ? (
             <>
               {formatCurrency(topCategory.total)} · {topCategory.percent.toFixed(0)}%
-              <Wide> of {summary.thisMonthCount > 0 ? "this month" : "all time"}</Wide>
+              <Wide> {summary.thisMonthCount > 0 ? "this month" : "all time"}</Wide>
             </>
           ) : (
             "No data yet"

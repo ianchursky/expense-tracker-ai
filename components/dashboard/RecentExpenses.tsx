@@ -30,11 +30,13 @@ export function RecentExpenses({ expenses }: { expenses: Expense[] }) {
             <button
               type="button"
               onClick={() => openEdit(e)}
-              aria-label={`Edit ${e.description}, ${formatCurrency(e.amount)}`}
               className="group flex w-full items-center gap-4 px-5 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:-outline-offset-2"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900">{e.description}</p>
+                <p className="truncate text-sm font-medium text-slate-900">
+                  <span className="sr-only">Edit </span>
+                  {e.description}
+                </p>
                 <p className="mt-1 flex items-center gap-2 text-xs text-slate-600">
                   <CategoryBadge category={e.category} />
                   <span className="whitespace-nowrap">{formatDate(e.date)}</span>

@@ -7,6 +7,7 @@ import { StorageWarning } from "@/components/layout/StorageWarning";
 import { ExpenseDialogProvider } from "@/components/providers/ExpenseDialogProvider";
 import { ExpenseProvider } from "@/components/providers/ExpenseProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { brand } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#15803d",
+  themeColor: brand[600],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

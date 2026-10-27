@@ -86,7 +86,7 @@ export function Menu({ trigger, label, items, triggerClassName }: MenuProps) {
           role="menu"
           aria-label={label}
           onKeyDown={onMenuKeyDown}
-          className="absolute right-0 top-full z-30 mt-1.5 w-60 max-w-[calc(100vw-2rem)] animate-slide-in rounded-xl border border-slate-200 bg-white p-1 shadow-[0_8px_24px_rgba(15,23,42,0.12)] motion-reduce:animate-none"
+          className="absolute right-0 top-full z-30 mt-1.5 w-60 max-w-[calc(100vw-2rem)] animate-slide-in rounded-xl border border-slate-200 bg-white p-1 shadow-menu motion-reduce:animate-none"
         >
           {items.map((item, i) => {
             if (item === "separator") return <div key={`sep-${i}`} role="separator" className="my-1 h-px bg-slate-100" />;

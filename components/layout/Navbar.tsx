@@ -84,7 +84,7 @@ export function Navbar() {
             type="button"
             onClick={openAdd}
             aria-label="Add expense"
-            className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-[0_4px_12px_rgba(21,128,61,0.35)] transition-colors hover:bg-brand-700"
+            className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-fab transition-colors hover:bg-brand-700"
           >
             <Plus className="h-6 w-6" aria-hidden />
           </button>

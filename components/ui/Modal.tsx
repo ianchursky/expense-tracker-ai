@@ -15,6 +15,7 @@ interface ModalProps {
 export function Modal({ open, onClose, title, description, children }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -31,6 +32,7 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
     <dialog
       ref={ref}
       aria-labelledby={titleId}
+      aria-describedby={description ? descriptionId : undefined}
       onClose={onClose}
       // Clicks on the dialog element itself (not its content) are backdrop clicks.
       onClick={(e) => {
@@ -45,7 +47,11 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
               <h2 id={titleId} className="text-lg font-semibold text-slate-900">
                 {title}
               </h2>
-              {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+              {description && (
+                <p id={descriptionId} className="mt-1 text-sm text-slate-600">
+                  {description}
+                </p>
+              )}
             </div>
             <button
               type="button"

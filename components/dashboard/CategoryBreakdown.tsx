@@ -12,7 +12,7 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload as CategoryTotal;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-[0_4px_12px_rgba(15,23,42,0.08)]">
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-popover">
       <p className="font-medium text-slate-900">{item.category}</p>
       <p className="text-slate-600 tabular-nums">
         {formatCurrency(item.total)} · {item.percent.toFixed(1)}%

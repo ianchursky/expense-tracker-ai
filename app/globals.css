@@ -23,6 +23,11 @@
     text-underline-offset: 3px;
   }
 
+  /* Avoid single-word last lines in body copy. */
+  p {
+    text-wrap: pretty;
+  }
+
   /* Native date picker: swap the browser's glyph for a palette-colored calendar icon. */
   input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;

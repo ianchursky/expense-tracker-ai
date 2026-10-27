@@ -133,10 +133,15 @@ export function ExpenseForm({ initial, onSubmit, onCancel, onDelete }: ExpenseFo
       </div>
 
       <fieldset>
-        <legend className="block text-sm font-medium text-slate-700">Category</legend>
+        <legend id={`${id}-category-legend`} className="block text-sm font-medium text-slate-700">
+          Category
+        </legend>
         <div
-          className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3"
+          role="radiogroup"
+          aria-labelledby={`${id}-category-legend`}
+          aria-invalid={!!categoryError}
           aria-describedby={categoryError ? `${id}-category-error` : undefined}
+          className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3"
         >
           {CATEGORIES.map((category, index) => {
             const { icon: Icon, iconClass } = CATEGORY_META[category];
@@ -148,15 +153,19 @@ export function ExpenseForm({ initial, onSubmit, onCancel, onDelete }: ExpenseFo
                   "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600",
                   selected
                     ? "border-brand-600 bg-brand-50 text-brand-700"
-                    : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50",
+                    : categoryError
+                      ? "border-red-300 text-slate-700 hover:bg-slate-50"
+                      : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50",
                 )}
               >
+                {/* Also referenced per option so the error is read when any option takes focus. */}
                 <input
                   id={index === 0 ? `${id}-category` : undefined}
                   type="radio"
                   name={`${id}-category`}
                   value={category}
                   checked={selected}
+                  aria-describedby={categoryError ? `${id}-category-error` : undefined}
                   onChange={() => {
                     set("category", category);
                     touch("category");

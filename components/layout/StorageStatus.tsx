@@ -52,7 +52,10 @@ export function StorageStatus({ variant }: { variant: "sidebar" | "inline" }) {
           <button
             type="button"
             onClick={exportAll}
-            className="-mx-1 rounded-md px-1 py-1 text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline"
+            className={clsx(
+              "-mx-1 inline-flex items-center rounded-md px-1 text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline",
+              variant === "inline" ? "min-h-11" : "py-1",
+            )}
           >
             Back up now
           </button>
