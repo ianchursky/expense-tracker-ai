@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Envelope Security Tint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1d3a6b;--tint:#8fa3bf;--ground:#eef1f6;--red:#b4361f;--ink:#14213a;--mute:#5b6b85}
+html,body{width:1440px;height:900px;overflow:hidden;font-family:"Public Sans",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+body{display:grid;grid-template-columns:232px 1fr;background-color:var(--ground);
+background-image:repeating-linear-gradient(45deg,rgba(29,58,107,.10) 0 1px,transparent 1px 7px),repeating-linear-gradient(-45deg,rgba(29,58,107,.07) 0 1px,transparent 1px 7px)}
+.rail{background:var(--navy);color:#fff;padding:28px 20px;display:flex;flex-direction:column;gap:6px}
+.mark{font-weight:800;font-size:17px;margin-bottom:28px}
+.rail a{color:#c9d5ea;text-decoration:none;font-size:15px;font-weight:500;padding:10px 12px;border-radius:4px}
+.rail a.on{background:rgba(255,255,255,.12);color:#fff}
+.priv{margin-top:auto;font-size:12px;line-height:1.5;color:#c9d5ea;border-top:1px solid rgba(255,255,255,.2);padding-top:16px}
+.priv b{color:#fff;display:block;font-size:13px;margin-bottom:4px}
+.main{padding:28px 40px}
+.top{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.top h1{font-size:28px;font-weight:800;color:var(--navy)}
+.sw{margin-left:auto;display:flex;align-items:center;gap:10px;background:#fff;padding:8px 14px;border-radius:4px;font-size:14px;font-weight:600;box-shadow:0 0 0 1px #c3cddc}
+.tog{width:36px;height:20px;border-radius:10px;background:var(--navy);position:relative}.tog:after{content:"";position:absolute;right:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff}
+.add{background:var(--red);color:#fff;border:0;font-weight:700;font-size:14px;padding:10px 18px;border-radius:4px}
+.win{background:#fff;border-radius:6px;box-shadow:0 0 0 1px #c3cddc;padding:28px 32px}
+.grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:28px}
+.k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.big{font-size:64px;font-weight:800;color:var(--navy);margin-top:8px;letter-spacing:-.02em}
+.veil{display:inline-block;color:transparent;border-radius:3px;background-color:#dfe5ee;
+background-image:repeating-linear-gradient(45deg,rgba(29,58,107,.35) 0 1px,transparent 1px 4px),repeating-linear-gradient(-45deg,rgba(29,58,107,.25) 0 1px,transparent 1px 4px)}
+.stat{font-size:30px;font-weight:700;margin-top:10px}
+.note{font-size:14px;color:var(--mute);margin-top:6px}
+.chart{margin-top:24px;height:180px;display:flex;align-items:flex-end;gap:22px;border-bottom:1px solid #c3cddc;padding:0 4px}
+.chart div{flex:1;background:var(--tint);border-radius:2px 2px 0 0}.chart div.now{background:var(--navy)}
+.lab{display:flex;gap:22px;padding:6px 4px 0;font-size:12px;color:var(--mute)}.lab span{flex:1}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--mute);font-weight:600;padding:8px 0;border-bottom:1px solid #c3cddc}
+td{padding:11px 0;border-bottom:1px solid #e3e8f0}td.r,th.r{text-align:right}
+.chip{font-size:12px;font-weight:600;color:var(--navy);background:#e6ecf5;padding:2px 8px;border-radius:3px}
+.peek{color:var(--ink)!important;background:none!important}
+</style></head><body>
+<aside class="rail"><div class="mark">Expense Tracker</div>
+<a class="on" href="#">Dashboard</a><a href="#">Expenses</a>
+<div class="priv"><b>Sealed on this device</b>128 entries live only in this browser. Nothing is sent anywhere. Last export: never.</div></aside>
+<main class="main">
+<div class="top"><h1>October 2026</h1><div class="sw">Privacy screen <span class="tog"></span></div><button class="add">+ Add expense</button></div>
+<section class="win">
+<div class="grid">
+<div><div class="k">Spent this month</div><div class="big"><span class="veil">$992.09</span></div><div class="note">Hover or focus any amount to reveal it</div></div>
+<div><div class="k">vs. September</div><div class="stat"><span class="veil">+4.4%</span></div><div class="note">September total <span class="veil">$950.50</span></div></div>
+<div><div class="k">Top category</div><div class="stat">Food</div><div class="note"><span class="veil">$486.15</span> · 49% of October</div></div>
+</div>
+<div class="chart"><div style="height:62%"></div><div style="height:58%"></div><div style="height:66%"></div><div style="height:61%"></div><div style="height:62%"></div><div class="now" style="height:65%"></div></div>
+<div class="lab"><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span></div>
+<table><tr><th>Date</th><th>Description</th><th>Category</th><th class="r">Amount</th></tr>
+<tr><td>Oct 26</td><td>Gas</td><td><span class="chip">Transportation</span></td><td class="r"><span class="veil">$64.53</span></td></tr>
+<tr><td>Oct 25</td><td>Lunch with coworkers</td><td><span class="chip">Food</span></td><td class="r"><span class="veil peek">$27.23</span></td></tr>
+<tr><td>Oct 25</td><td>Electricity bill</td><td><span class="chip">Bills</span></td><td class="r"><span class="veil">$99.20</span></td></tr>
+<tr><td>Oct 23</td><td>Movie tickets</td><td><span class="chip">Entertainment</span></td><td class="r"><span class="veil">$23.07</span></td></tr></table>
+</section></main></body></html>

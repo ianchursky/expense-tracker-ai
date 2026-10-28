@@ -1,0 +1,97 @@
+JSON BACKUP AND RESTORE - work summary
+Worktree: C:\Repositories\expense-tracker-json-restore (branch feature/json-restore, from main)
+Status: uncommitted changes in the working tree (nothing committed or pushed).
+
+WHAT WAS IMPLEMENTED
+- "Back up (JSON)" button on the Expenses page header. It downloads ALL expenses (filters are ignored) as a versioned JSON document named expense-tracker-backup-YYYY-MM-DD.json (local date), then shows a toast.
+- "Restore from backup" button in the Expenses page header and in the empty state, so a fresh browser can restore. It opens an app-wide native <dialog> owned by ExpenseDialogProvider (same pattern as the add/edit form and the confirm dialog).
+- Restore dialog flow:
+  1. A labelled file input ("Backup file (.json)", accept .json) with a hint. It gets initial focus through data-autofocus.
+  2. The file size is checked before reading (10 MB limit). The text is then parsed and validated by lib/backup.ts. Document-level errors appear in a role="alert" box.
+  3. Preview as readable text (a <dl> in a role="status" region): file name, exported-at time, valid records, new, identical duplicates, conflicts (with how many are newer in the backup), and invalid records. Invalid records are listed in an expandable <details> as "Record N (index i): reason", capped at 50 rows; the count stays exact.
+  4. Strategy radio group (fieldset/legend):
+     - Merge: adds new records. For a conflict it keeps the copy with the later updatedAt; on a tie it keeps the current copy.
+     - Replace all: deletes the current data and loads the backup's valid records.
+     The merge button is disabled when the merge would change nothing.
+  5. Merge applies immediately. Replace all opens the existing app-wide confirm dialog ("Replace all expenses?"), which stacks above the restore dialog. Cancel returns you to the preview.
+  6. Every restore is one complete list written in a single commit() (never partial). The success toast offers Undo, which writes back the exact previous array snapshot.
+- Robustness:
+  - Rejects: empty files, non-JSON, a non-object or wrong "format", a missing, non-integer or < 1 version, a future version (> 1), a missing "expenses" array, input over 10 MB (checked on File.size in the UI and on text length in the lib), and more than 50,000 records.
+  - Each record is validated with the app's own form rules: validateExpenseForm() plus toExpenseInput(). That means a real local YYYY-MM-DD date that is not in the future and not before 1900, a category in CATEGORIES, an amount that is a positive finite number with at most 2 decimals and no more than 1,000,000, and a trimmed description of 1 to 100 chars (whitespace normalized the same way the form does).
+  - Records also need a non-empty id (max 200 chars) and parseable createdAt/updatedAt.
+  - A repeated id inside the file is reported as invalid. Unknown fields are stripped.
+  - Bad records are reported and skipped; they never fail the whole import.
+
+FILES CREATED
+- lib/backup.ts: pure, framework-free logic. Constants BACKUP_FORMAT, BACKUP_VERSION, MAX_BACKUP_BYTES, MAX_BACKUP_RECORDS. Functions createBackup, serializeBackup, backupFilename, validateBackupRecord, parseBackup, previewRestore, applyRestore, plus downloadJSON (a DOM helper mirroring downloadCSV; it is not called by the tests).
+- components/backup/RestoreBackupForm.tsx: the restore dialog body (file input, preview, strategy, apply/Undo).
+- components/backup/BackupActions.tsx: BackupButton and RestoreButton.
+- tests/json-restore.test.ts: node:test suite.
+
+FILES MODIFIED (all shared; diffs kept minimal: 31 insertions, 1 deletion)
+- components/providers/ExpenseProvider.tsx (+13/-1):
+  - commit() now returns its save error (string | null); this is the "return error;" line.
+  - New context method replaceExpenses(update: (current) => Expense[]) => { previous, error }. It goes through commit() as one write, so Undo gets the exact previous list. It is needed because no existing method can swap the whole list while keeping ids and timestamps.
+  - Added replaceExpenses to the value object and to the useMemo deps line.
+- components/providers/ExpenseDialogProvider.tsx (+14): import RestoreBackupForm, add openRestore to the context interface and value, add restoreOpen state and closeRestore, render one <Modal> for the restore dialog before the confirm modal.
+- components/expenses/ExpensesView.tsx (+4): import BackupActions; <BackupButton/><RestoreButton/> after "Export CSV" in the header; <RestoreButton/> in the empty state.
+- Not touched: lib/types.ts, lib/storage.ts, lib/csv.ts, app/layout.tsx, package.json, CLAUDE.md.
+
+DEPENDENCIES ADDED
+none
+
+BACKUP FILE FORMAT
+{
+  "format": "expense-tracker-backup",      // exact string, required
+  "version": 1,                            // integer >= 1, required
+  "exportedAt": "2026-10-28T14:03:00.000Z",// UTC ISO timestamp (informational; ignored if invalid)
+  "count": 3,                              // informational only, not enforced
+  "expenses": [                            // required array, max 50,000 entries
+    { "id": "uuid", "date": "YYYY-MM-DD", "amount": 12.5, "category": "Food",
+      "description": "Lunch", "createdAt": "ISO", "updatedAt": "ISO" }
+  ]
+}
+- The file is pretty-printed with 2-space indentation. Records are full Expense objects in stored order.
+- Versioning rules: BACKUP_VERSION is bumped whenever the document shape changes. parseBackup must keep reading every older version (migrate inside parseBackup). Versions above BACKUP_VERSION are rejected with "made by a newer version of the app". The backup version is independent of the localStorage key version (expense-tracker:expenses:v1).
+- Record identity is "id". "Identical duplicate" means every field is equal, including createdAt and updatedAt.
+
+TESTING APPROACH
+Commands (Git Bash, from the worktree):
+  npx tsc --outDir "$TEMP/restore-test-build" --rootDir . --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop tests/json-restore.test.ts
+  node --test "$TEMP/restore-test-build/tests/json-restore.test.js"
+Note: on Node 24, "node --test <directory>" treated the directory as one failing test file, so point it at the .js file (or at a glob such as "$TEMP/restore-test-build/tests/*.test.js"). NODE_PATH is not needed: lib/backup.ts does not import lucide-react.
+Result: 16 tests in 6 suites, 16 pass, 0 fail.
+Coverage:
+- backup document shape and local-date filename
+- round trip: replace gives identical data; merging into the same data is a no-op with all duplicates
+- merge: new, duplicate and conflict classification; the newer updatedAt wins; ties keep the current copy; inputs are not mutated
+- replace
+- invalid JSON and empty files
+- wrong format, a top-level array, null, a non-array expenses field
+- future and malformed versions
+- oversized input (> 10 MB) and > 50,000 records
+- an empty backup (merge is a no-op; replace empties the list)
+- a mixed valid/invalid file with per-index reasons: bad date, unknown category, negative, zero, sub-cent, too large, string amount, long or blank description, future and pre-1900 dates, bad timestamp, empty id, duplicate id
+- unknown-field stripping and description normalization
+
+TYPECHECK/LINT/BUILD RESULTS
+- npx tsc --noEmit: pass (no errors; this includes tests/json-restore.test.ts, because tsconfig includes **/*.ts)
+- npx next lint: "No ESLint warnings or errors"
+- npx next build: compiled successfully, 5/5 static pages generated (/expenses is 8.45 kB)
+- The app was not run (per instructions), so the dialog UI has not been checked in a browser.
+
+KNOWN LIMITATIONS
+- Records dated in the future are rejected, the same as the form. A backup made in a timezone ahead of yours, containing an expense for "today", could have that record rejected; it is reported, not silently dropped.
+- Records whose amount has more than 2 decimals are rejected rather than rounded.
+- The size check in the lib uses string length (UTF-16 code units). The UI checks the real File.size first.
+- localStorage is about 5 MB. A large restore can exceed the quota: commit() then shows the existing "Couldn't save" error toast and the in-memory state still holds the restored list (existing app behavior for any mutation). No Undo toast is shown in that case.
+- Undo restores the snapshot taken at apply time. Edits made in another tab between the restore and clicking Undo are overwritten by Undo.
+- "count" in the file is not cross-checked against expenses.length.
+- The "Delete all" confirmation text still says "Export a CSV first if you want a backup". It was left unchanged to avoid conflicts; consider pointing it to "Back up (JSON)" after merging.
+
+INTEGRATION NOTES
+- ExpenseProvider.tsx: a likely conflict at the useMemo value object and its single-line deps array if a sibling also adds a context method. Resolve by keeping both methods in the interface, the value object and the deps array. The "return error;" added to commit() is harmless to other callers, because nothing else uses the return value.
+- ExpenseDialogProvider.tsx: likely conflicts in the context interface, the useMemo value, the state hooks and the JSX if siblings add dialogs. All additions are independent; keep both sides. Keep the restore <Modal> rendered inside ExpenseDialogContext.Provider, because RestoreBackupForm calls useExpenseDialogs().confirm.
+- ExpensesView.tsx: conflicts are possible in the PageHeader actions fragment, the empty-state children and the import block. Keep both sides. If the header gets crowded, the two backup buttons could move into an overflow menu.
+- If a sibling changes the Expense shape, the CATEGORIES list or the validation rules, then lib/backup.ts validateBackupRecord and the tests may need updating. A changed Expense shape should bump BACKUP_VERSION and add a migration in parseBackup.
+- No changes to package.json, layout, types, storage or CSV, so there are no conflicts there.

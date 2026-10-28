@@ -1,0 +1,166 @@
+DARK MODE - WORK SUMMARY
+Worktree: C:\Repositories\expense-tracker-dark-mode (branch feature/dark-mode, from main)
+Status: all changes left uncommitted in the working tree (nothing committed or pushed).
+
+WHAT WAS IMPLEMENTED
+- Three theme choices: System (default; follows prefers-color-scheme and reacts live to OS changes via a
+  matchMedia "change" listener), Light, Dark.
+- Navbar theme control (components/layout/ThemeMenu.tsx): an icon menu button following the WAI-ARIA
+  menu-button pattern. The trigger has aria-haspopup="menu", aria-expanded, and aria-label
+  "Theme: <current choice>", so the current choice is announced. Items are role="menuitemradio" with
+  aria-checked. Keyboard: Enter/Space/ArrowDown/ArrowUp open it; ArrowUp/ArrowDown/Home/End move between
+  items; Enter/Space choose; Escape closes and returns focus to the trigger; Tab closes; clicking outside
+  closes. Focus starts on the checked item. The trigger icon shows the resolved theme (sun/moon), or a
+  neutral monitor icon before load so it matches the server render.
+- The preference is saved to localStorage under a versioned key. If storage is unavailable (reads or writes
+  throw) it falls back to System and the choice lasts only for the current page load. Invalid or missing
+  values parse to System. Open tabs stay in sync through the "storage" event.
+- Tailwind darkMode: "class" on <html>. Dark variants were added to every page and component: body, navbar,
+  nav links, cards, card headers, stat cards and their icon chips, the bar chart and donut chart (plus
+  tooltips, the center total, the legend list and the progress bars), recent expenses, the expense
+  table/mobile list (header, dividers, hover rows, sort headers, row actions), filters (inputs, select,
+  date inputs, floating labels, preset chips, clear button, invalid-range state), the expense form (inputs,
+  error rings, error text, category radio tiles, character counter), the modal (panel, title, close button,
+  backdrop), the confirm dialog warning box, toasts, the storage warning banner, empty states, skeletons,
+  the segmented control, buttons (secondary/ghost), the page header, error.tsx and not-found.tsx.
+- CATEGORY_META has dark variants for badgeClass (dark:bg-*-400/10 dark:text-*-300 dark:ring-*-400/30) and
+  iconClass (dark:bg-*-400/15 dark:text-*-300), all written as complete literal strings.
+- color-scheme: globals.css sets :root { color-scheme: light } and :root.dark { color-scheme: dark }, so date
+  inputs, select popups, scrollbars and dialog UA styles follow the applied theme (manual choice included).
+- viewport.themeColor now has two entries: light #4f46e5 (unchanged) and dark #0f172a, using
+  prefers-color-scheme media queries.
+- WCAG AA: I computed the main dark pairs (WCAG formula, alpha tints composited over the card color):
+  slate-400 on slate-900 6.96:1, slate-400 on slate-800 5.71, brand-300 on brand tint 7.61, red-400 on
+  slate-900 6.45, emerald-400 9.29, category badge text 8.7-10.3, toast/confirm/warning text 11+,
+  white on brand-600 6.29. Chart tick color #94a3b8 on the slate-900 card is 6.96:1. In light mode, the
+  form's character counter changed from text-slate-400 (2.56:1, fails AA) to text-slate-500 (4.76:1).
+
+FILES CREATED
+- lib/theme.ts: pure logic. THEME_STORAGE_KEY, THEME_PREFERENCES, types, parseThemePreference,
+  isThemePreference, resolveTheme, load/saveThemePreference (guarded with try/catch), THEME_COLORS,
+  CHART_COLORS, and THEME_INIT_SCRIPT (the inline pre-paint script, built from the same constants).
+- components/providers/ThemeProvider.tsx: ThemeProvider and the useTheme() hook (preference,
+  resolvedTheme, isLoaded, setPreference).
+- components/layout/ThemeMenu.tsx: the navbar theme menu.
+- tests/dark-mode.test.ts: node:test suite (described under Testing approach).
+
+FILES MODIFIED
+- app/layout.tsx: inline script in <head>, suppressHydrationWarning on <html>, ThemeProvider as the
+  outermost provider (the provider tree was re-indented one level), dark body classes, themeColor array.
+- app/globals.css: color-scheme rules.
+- app/error.tsx, app/not-found.tsx
+- tailwind.config.ts: darkMode: "class", plus brand 300 (#a5b4fc) and 400 (#818cf8) shades.
+- lib/categories.ts: dark variants in CATEGORY_META, and a doc comment tweak.
+- components/dashboard/CategoryBreakdown.tsx, MonthlyTrendChart.tsx, RecentExpenses.tsx, SummaryCards.tsx
+- components/expenses/ExpenseFiltersBar.tsx, ExpenseForm.tsx, ExpenseList.tsx, ExpensesView.tsx
+- components/layout/Navbar.tsx: ThemeMenu added. The "Add expense" button is now wrapped in a
+  "ml-auto flex" div together with the menu.
+- components/layout/StorageWarning.tsx
+- components/providers/ExpenseDialogProvider.tsx, ToastProvider.tsx
+- components/ui/Button.tsx, Card.tsx, EmptyState.tsx, Modal.tsx, PageHeader.tsx, SegmentedControl.tsx
+  (CategoryBadge.tsx needed no change because it reads CATEGORY_META.)
+- CLAUDE.md: ThemeProvider added to the provider order, plus one new convention bullet about dark mode.
+
+DEPENDENCIES ADDED
+none (package.json untouched)
+
+STORAGE KEYS ADDED
+- expense-tracker:theme:v1, holding the raw string "system" | "light" | "dark".
+
+HOW FLASH-OF-WRONG-THEME IS PREVENTED
+- app/layout.tsx renders <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} /> in <head>. It
+  runs synchronously before the body is parsed or painted. It reads the stored preference (with try/catch),
+  treats anything other than light/dark as system, resolves system through
+  matchMedia("(prefers-color-scheme: dark)"), and toggles the "dark" class on <html>. color-scheme follows
+  from that class through CSS, so nothing else needs setting. The whole script is wrapped in try/catch.
+- <html> has suppressHydrationWarning because the class differs from the server HTML by design.
+- ThemeProvider reads the same state in a mount effect and only starts writing the class once it has
+  loaded (isLoaded), so its pre-load defaults never undo what the script applied. After that, it toggles
+  the class on preference changes, OS changes and cross-tab storage events.
+- A test runs the script string against fake window/document objects for every stored value
+  (missing, valid, invalid) and both OS settings, and checks it agrees with parseThemePreference and
+  resolveTheme. That guards against the two drifting apart.
+- Verified in the build output: .next/server/app/index.html contains the inline script and both
+  theme-color meta tags. The compiled CSS contains the :is(.dark *) variants, the
+  dark:backdrop:bg-black/70 ::backdrop rule, and :root.dark{color-scheme:dark}.
+
+CHART THEMING APPROACH
+- Recharts takes colors as props, so lib/theme.ts exports
+  CHART_COLORS: Record<"light" | "dark", { grid, tick, cursor, bar }>.
+  Light keeps the original values: #e2e8f0, #64748b, #eef2ff, #6366f1.
+  Dark uses #334155 (grid), #94a3b8 (ticks), #1e293b (hover cursor), #818cf8 (bars).
+- MonthlyTrendChart reads CHART_COLORS[useTheme().resolvedTheme] and passes the colors to CartesianGrid,
+  the XAxis/YAxis tick props, the Tooltip cursor and Bar.
+- Tooltips are custom HTML content components, so they use dark: classes. The donut keeps the category
+  hex colors, which stay legible on the dark card. Its legend and center label are HTML with dark: classes.
+- Charts render only after expenses load, which happens in the same mount pass as the theme, so they
+  should not appear with the wrong palette.
+
+TESTING APPROACH
+No test runner was added. From the worktree root (Git Bash):
+  npx tsc --outDir "$TEMP/theme-test-build" --rootDir . --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop tests/dark-mode.test.ts
+  NODE_PATH=./node_modules node --test "$TEMP/theme-test-build/tests/dark-mode.test.js"
+Note: on Node 24, `node --test <directory>` failed with MODULE_NOT_FOUND, so pass the compiled file path.
+NODE_PATH is needed because lib/categories.ts imports lucide-react. The command must run from the worktree
+root, because the class scan reads app/, components/ and lib/categories.ts relative to process.cwd().
+Result: 14 tests, 7 suites, 14 passed, 0 failed.
+Covered:
+- parsing valid, missing (null, undefined, "") and invalid ("Dark", " dark", "auto", JSON-quoted,
+  trailing newline) values, plus non-string values;
+- System resolution for both OS settings, and explicit choices ignoring the OS;
+- load/save round-trip, invalid stored values, and storage that throws;
+- init-script parity with the pure functions, and that the script does not throw;
+- CHART_COLORS defines dark values for every color;
+- every CATEGORY_META entry has dark:bg, dark:text (badge and icon) and dark:ring (badge) classes;
+- a light-only class scan. In every string literal in app/, components/ and lib/categories.ts, a light
+  class needs a dark: class for the same utility type and the same variant prefix (for example,
+  hover:bg-slate-50 needs a dark:hover:bg-*). The classes checked are: bg-white and bg-<color>-50/100/200;
+  text-slate-500..950 and text-<color>-600..950; border/ring/divide-<color>-100..300 and
+  ring-slate-900/10. The scanner has its own unit test.
+  Result: 29 files scanned, 0 light-only classes remaining.
+  Deliberately not flagged: mid-tones that work in both themes (text-slate-400 icons, *-500 status icons,
+  bg-brand-600 with text-white).
+
+TYPECHECK/LINT/BUILD RESULTS
+- npx tsc --noEmit: passed, no errors (this includes tests/, since tsconfig includes **/*.ts).
+- npx next lint: "No ESLint warnings or errors".
+- npx next build: compiled successfully; all 5 static pages generated (/ 215 kB first load, /expenses
+  102 kB).
+
+KNOWN LIMITATIONS
+- Nothing was visually verified. The app was never run, so none of the following was seen in a browser:
+  the dark appearance, the absence of a flash, the menu behaviour, native control rendering, or the dialog
+  backdrop. Contrast ratios are calculated, not measured on screen. Things worth a manual check: the
+  translucent navbar over dark content; the floating "From"/"To" labels (bg-slate-900) sitting on the
+  slate-800 input border; Recharts' default focus outline on the chart; and the native date-picker icon
+  in dark mode.
+- The theme-color meta tags follow the OS setting, not a manual Light/Dark choice. The browser UI color
+  can mismatch when the manual choice differs from the OS.
+- With JavaScript disabled, the page always renders light, because darkMode is class-based.
+- No transition suppression when switching themes, so elements with transition-colors animate briefly.
+- Before ThemeProvider loads, the trigger's aria-label briefly says "Theme: System" even if another choice
+  is stored. The visible menu is not affected.
+- Pre-existing light-mode issues left unchanged: placeholder text slate-400 on white (2.56:1), and
+  icon-only buttons in text-slate-400 (below 3:1 in light mode). Both are outside the scope of a dark-only
+  change. In dark mode these use slate-400 on slate-800/900, which passes.
+- tests/ is included by the root tsconfig, so `npx tsc --noEmit` and `next build` type-check the test file.
+  It uses node: imports, which @types/node already covers.
+
+INTEGRATION NOTES (likely merge conflicts)
+- app/layout.tsx: very likely to conflict if a sibling branch adds a provider, because I re-indented the
+  provider tree under <ThemeProvider>. Resolve by keeping ThemeProvider as the outermost wrapper with the
+  other branch's providers inside it. Also keep the <head> script, suppressHydrationWarning, the dark body
+  classes and the themeColor array.
+- Any component another branch also edits: conflicts will be on className string lines, because I only
+  appended dark:* classes, with no renames or restructuring. Resolve by taking the other branch's line and
+  re-appending the dark: classes. Then run the test suite: the light-only scan lists any light class the
+  other branch added without a dark counterpart (file plus class).
+- New UI from sibling branches (new pages, components or chart series) needs dark: variants, and
+  theme-aware Recharts colors from CHART_COLORS / useTheme(). The scan enforces the class part.
+- lib/categories.ts: if another branch adds a category, its CATEGORY_META entry needs dark badgeClass and
+  iconClass strings. The CATEGORY_META test fails otherwise.
+- components/layout/Navbar.tsx: the Add button moved into a "ml-auto flex items-center gap-2" wrapper with
+  ThemeMenu. Any branch that adds navbar items should put right-aligned items inside that wrapper.
+- tailwind.config.ts: two small additions (darkMode and brand 300/400). Easy to merge by hand.
+- CLAUDE.md: one changed line (provider order) and one added bullet.
+- package.json: untouched.

@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, Sparkles, Wallet } from "lucide-react";
+import { FileUp, Plus, Sparkles, Wallet } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
@@ -12,11 +13,19 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { getDashboardSummary, monthlyTotals, sortExpenses, totalsByCategory } from "@/lib/analytics";
 import { monthKey, todayISO } from "@/lib/format";
-import { generateSampleExpenses } from "@/lib/sampleData";
-import { CategoryBreakdown } from "./CategoryBreakdown";
-import { MonthlyTrendChart } from "./MonthlyTrendChart";
 import { RecentExpenses } from "./RecentExpenses";
 import { SummaryCards } from "./SummaryCards";
+
+// Recharts is most of this page's JavaScript; load it after the summary and transactions render.
+// The placeholders match each card's footprint so nothing shifts when the charts arrive.
+const MonthlyTrendChart = dynamic(() => import("./MonthlyTrendChart").then((m) => m.MonthlyTrendChart), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 rounded-xl lg:col-span-3" />,
+});
+const CategoryBreakdown = dynamic(() => import("./CategoryBreakdown").then((m) => m.CategoryBreakdown), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 rounded-xl lg:col-span-2" />,
+});
 
 type CategoryPeriod = "month" | "all";
 
@@ -30,22 +39,22 @@ function DashboardSkeleton() {
     <div aria-busy="true" aria-label="Loading dashboard">
       <Skeleton className="mb-2 h-8 w-48" />
       <Skeleton className="mb-6 h-4 w-72" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, i) => (
-          <Skeleton key={i} className="h-32 rounded-2xl" />
+          <Skeleton key={i} className="h-[108px] rounded-xl" />
         ))}
       </div>
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
-        <Skeleton className="h-96 rounded-2xl lg:col-span-3" />
-        <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
+      <div className="mt-4 grid gap-4 lg:grid-cols-5">
+        <Skeleton className="h-80 rounded-xl lg:col-span-3" />
+        <Skeleton className="h-80 rounded-xl lg:col-span-2" />
       </div>
     </div>
   );
 }
 
 export function DashboardView() {
-  const { expenses, isLoaded, addExpenses } = useExpenses();
-  const { openAdd } = useExpenseDialogs();
+  const { expenses, isLoaded, loadSampleData } = useExpenses();
+  const { openAdd, openImport } = useExpenseDialogs();
   const { toast } = useToast();
   const [period, setPeriod] = useState<CategoryPeriod>("month");
 
@@ -64,9 +73,7 @@ export function DashboardView() {
   if (!isLoaded) return <DashboardSkeleton />;
 
   const loadSample = () => {
-    const sample = generateSampleExpenses();
-    addExpenses(sample);
-    toast(`Loaded ${sample.length} sample expenses.`, "info");
+    toast(`Loaded ${loadSampleData()} sample expenses.`, "info");
   };
 
   if (expenses.length === 0) {
@@ -77,10 +84,13 @@ export function DashboardView() {
           <EmptyState
             icon={Wallet}
             title="No expenses yet"
-            description="Add your first expense to start seeing summaries and charts, or load sample data to explore the app."
+            description="No account needed: everything you enter stays in this browser. Add your first expense, restore a CSV backup, or load sample data to look around."
           >
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" aria-hidden /> Add expense
+            </Button>
+            <Button variant="secondary" onClick={openImport}>
+              <FileUp className="h-4 w-4" aria-hidden /> Import CSV
             </Button>
             <Button variant="secondary" onClick={loadSample}>
               <Sparkles className="h-4 w-4" aria-hidden /> Load sample data
@@ -95,7 +105,7 @@ export function DashboardView() {
     <>
       <PageHeader title="Dashboard" description="An overview of your spending." />
       <SummaryCards summary={summary} />
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
+      <div className="mt-4 grid gap-4 lg:grid-cols-5">
         <MonthlyTrendChart data={monthly} />
         <CategoryBreakdown
           data={categoryData}
@@ -103,7 +113,7 @@ export function DashboardView() {
           action={<SegmentedControl label="Category period" options={PERIOD_OPTIONS} value={period} onChange={setPeriod} />}
         />
       </div>
-      <div className="mt-6">
+      <div className="mt-4">
         <RecentExpenses expenses={recent} />
       </div>
     </>

@@ -43,11 +43,12 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
     badgeClass: "bg-pink-50 text-pink-700 ring-pink-600/20",
     iconClass: "bg-pink-100 text-pink-600",
   },
+  // Indigo rather than green: green is reserved for the accent and for "spending went down".
   Bills: {
     icon: Receipt,
-    color: "#10b981",
-    badgeClass: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-    iconClass: "bg-emerald-100 text-emerald-600",
+    color: "#6366f1",
+    badgeClass: "bg-indigo-50 text-indigo-700 ring-indigo-600/20",
+    iconClass: "bg-indigo-100 text-indigo-600",
   },
   Other: {
     icon: MoreHorizontal,

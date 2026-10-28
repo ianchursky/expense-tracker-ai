@@ -1,0 +1,220 @@
+RECURRING EXPENSES - WORK SUMMARY
+Worktree: C:\Repositories\expense-tracker-recurring-expenses (branch feature/recurring-expenses, from main)
+Status: uncommitted changes in the working tree (nothing committed or pushed, as instructed).
+
+============================================================
+WHAT WAS IMPLEMENTED
+============================================================
+- Recurring rules: amount, category, description, frequency (weekly, every 2 weeks, monthly, yearly),
+  start date, optional end date, paused flag, and a "generatedThrough" date (how far generation has got).
+- Scheduling (pure, in lib/recurring.ts):
+  - occurrenceDate(schedule, n) always computes from the start date, so monthly/yearly month-end
+    clamping never drifts: Jan 31 -> Feb 28 (Feb 29 in leap years) -> Mar 31 -> Apr 30. Yearly Feb 29
+    -> Feb 28 in non-leap years.
+  - occurrencesBetween(schedule, after, through, limit) honors the end date. It starts from an estimated
+    index, so a rule that began decades ago doesn't step from occurrence 0 every time.
+  - nextOccurrence(rule) returns the first occurrence after generatedThrough, or null once the rule
+    has ended.
+- Generation (generateDueExpenses, pure):
+  - Creates ordinary Expense objects for every occurrence due on or before today.
+  - Ids are deterministic: "recurring:<ruleId>:<YYYY-MM-DD>". recurringExpenseId(),
+    parseRecurringExpenseId() and isGeneratedByRule() trace an expense back to its rule.
+  - Each occurrence is created exactly once, by two mechanisms:
+    (1) the per-rule generatedThrough watermark only moves forward, so a generated expense the user
+        deleted or edited is never recreated;
+    (2) existing ids are skipped, so a run with stale rules (StrictMode double effects, two tabs loading
+        at once) can't add duplicates.
+    When a run isn't capped, it advances generatedThrough to today. Rule edits therefore apply only to
+    future occurrences, and the form says so.
+  - Runaway guard: MAX_GENERATED_PER_RUN = 200, shared across all rules. A capped run sets the watermark
+    to the last generated date and reports capped=true. The user sees an info toast with a "Continue"
+    action, and the rest is also generated on the next load. The add form warns ahead of time when a
+    start date would backfill more than 200 expenses, and otherwise shows how many past expenses will be
+    added.
+  - Generation runs on app load (once, guarded by a ref, and idempotent anyway), after a rule is created
+    or edited, after a resume, and when the tab becomes visible again (which covers the date changing
+    while the app is open).
+  - If saving the expenses to localStorage fails, the rule watermarks are not advanced, so the next load
+    generates those expenses again instead of losing them.
+- Pause/resume: paused rules generate nothing. Resuming skips occurrences missed while paused
+  (watermark = yesterday) but still generates today's. A toast says that missed occurrences were skipped.
+- Delete: a dialog shows how many expenses the rule has already created and offers three choices:
+  Cancel, "Delete rule, keep expenses", or "Delete rule and N expenses". If the rule created nothing,
+  it shows a single "Delete rule" button. The success toast has Undo, which restores the rule and any
+  removed expenses.
+- UI:
+  - New /recurring page (RecurringView) lists each rule with its category icon, description, schedule
+    text, the number of expenses created so far, the amount, and the next occurrence
+    ("Next Nov 30, 2026", "Paused", "Ended", or "(catching up)" while capped).
+  - Edit, Pause/Resume and Delete are icon buttons with descriptive aria-labels.
+  - Shows an empty state and a loading skeleton.
+  - The rule form (RecurringRuleForm) follows ExpenseForm's patterns: labels tied to inputs,
+    aria-invalid/aria-describedby, errors shown after blur or submit, focus moves to the first invalid
+    field on submit, data-autofocus works with the native <dialog>, keyboard-accessible category radios,
+    and a native <select> for frequency.
+  - Validation messages cover amount (required, format, > 0, <= $1,000,000), category, description
+    (required, <= 100 chars), frequency, start date (required, valid, >= 1900-01-01, within 10 years
+    from today; future starts are allowed), and end date (valid, not before the start date).
+- Storage: rules use their own key "expense-tracker:recurring:v1". parseStoredRules() drops malformed or
+  duplicate rules and counts them (toast: "N invalid recurring rule(s) were skipped."), and reports an
+  error for corrupt JSON or a non-array value instead of throwing. Rules sync across tabs via the
+  "storage" event.
+- Conventions followed: local YYYY-MM-DD strings with parseISODate/toISODate, roundToCents, the form keeps
+  amount as a string until toRecurringInput(), CATEGORIES/CATEGORY_META, the native <dialog> Modal, and
+  every expense mutation goes through ExpenseProvider's commit().
+
+============================================================
+FILES CREATED
+============================================================
+- lib/recurring.ts                           Pure logic: types, frequencies, occurrence math, clamping,
+                                             next occurrence, deterministic ids, generation with cap,
+                                             pause/resume/update helpers, form validation +
+                                             toRecurringInput, isRecurringRule + parseStoredRules.
+                                             Framework-free; imports only format/types/validation.
+- lib/recurringStorage.ts                    RECURRING_STORAGE_KEY, loadRules(), saveRules()
+                                             (localStorage wrappers mirroring lib/storage.ts).
+- components/providers/RecurringProvider.tsx Rules state + ref mirror, load/cross-tab sync, generation
+                                             runs, the single app-wide rule form modal and delete-choice
+                                             modal; exposes useRecurring().
+- components/recurring/RecurringRuleForm.tsx Add/edit rule form.
+- components/recurring/RecurringView.tsx     /recurring page view (rule list).
+- app/recurring/page.tsx                     Thin server page exporting metadata, renders RecurringView.
+- tests/recurring-expenses.test.ts           node:test suite (34 tests).
+
+============================================================
+FILES MODIFIED (all shared files)
+============================================================
+- components/providers/ExpenseProvider.tsx (+13/-1): SHARED.
+  - Added one context method, updateExpenses(update: (current) => Expense[]): boolean. It applies a batch
+    change computed from the current list in a single commit() and returns false if saving failed.
+    Returning the same array is a no-op with no write. Generation (bulk insert) and "delete rule and its
+    expenses" (bulk remove) need it.
+  - commit() now also returns its error string (previously void). Existing callers are unaffected.
+  - The method is added to the interface, the body, and the value useMemo object and dependency list.
+- app/layout.tsx (+2/-1): SHARED.
+  - Imported RecurringProvider and wrapped only {children} inside <main>:
+    <RecurringProvider>{children}</RecurringProvider>
+  - It sits inside ToastProvider -> ExpenseProvider -> ExpenseDialogProvider. Navbar doesn't need the
+    context, so the rest of the tree was left unchanged.
+- components/layout/Navbar.tsx (+3/-2): SHARED.
+  - Added the Repeat icon import and a { href: "/recurring", label: "Recurring" } entry to LINKS.
+  - Wrapped the link label in <span className="sr-only sm:not-sr-only">. With three links the labels no
+    longer fit next to the Add button at phone width; this makes links icon-only below the sm breakpoint
+    while keeping an accessible name.
+- Not touched: lib/types.ts, lib/storage.ts, components/providers/ExpenseDialogProvider.tsx,
+  components/providers/ToastProvider.tsx, tailwind.config.ts, package.json, package-lock.json, CLAUDE.md.
+
+============================================================
+DEPENDENCIES ADDED
+============================================================
+none
+
+============================================================
+STORAGE KEYS / EXPENSE SHAPE
+============================================================
+- Added: "expense-tracker:recurring:v1". It stores a JSON array of RecurringRule:
+  { id, amount, category, description, frequency, startDate, endDate|null, paused, generatedThrough|null,
+    createdAt, updatedAt }
+- Expense shape: UNCHANGED. Generated expenses are plain Expense records; their link to the rule is
+  encoded only in the id ("recurring:<ruleId>:<date>"). "expense-tracker:expenses:v1" is unchanged and
+  needs no migration.
+
+============================================================
+TESTING APPROACH
+============================================================
+tests/recurring-expenses.test.ts (node:test + node:assert/strict, imports ../lib/recurring) covers:
+- each frequency, including biweekly across a DST change;
+- that the estimated start index gives the same results as stepping from occurrence 0;
+- month-end clamping: Jan 31 -> Feb 28 -> Mar 31, leap-year Feb 29, yearly Feb 29, crossing a year
+  boundary;
+- end dates (exclusive after, inclusive on the date) and start dates in the future;
+- next occurrence;
+- generated expense shape and traceability, and an occurrence due today;
+- idempotency: running twice, and stale rules (StrictMode or another tab) deduplicated by id;
+- deleted or edited generated expenses are not recreated, and future generation still works;
+- day-by-day advancement without gaps; pause/resume semantics; edits apply to the future only; ended
+  rules stop generating;
+- the runaway cap: a 1990 weekly rule caps at 200 per run, continues across runs, and ends with exactly
+  the total number of expenses, no duplicates; the cap is shared across rules; hitting the limit exactly
+  is not reported as capped;
+- id round-trip and rejection of ordinary ids;
+- malformed stored rules (13 kinds dropped, including a duplicate id), non-array and corrupt JSON;
+- form validation: valid values and conversion, required fields, 13 invalid-input cases, future start
+  dates and same-day end dates.
+
+Commands (Git Bash, from the worktree root):
+  npx tsc --outDir "$TEMP/recurring-test-build" --rootDir . --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop tests/recurring-expenses.test.ts
+  node --test "$TEMP/recurring-test-build/tests/recurring-expenses.test.js"
+Note: on Node 24, passing the directory (".../tests") to node --test fails with MODULE_NOT_FOUND, because
+it treats the directory as a single entry file. Pass the compiled .js file, or a glob such as
+"$TEMP/recurring-test-build/tests/*.test.js".
+NODE_PATH was not needed (lib/recurring.ts doesn't import lucide-react).
+
+Result: tests 34, suites 8, pass 34, fail 0.
+I also tried re-running with the TZ variable set to New_York, Auckland, Sao_Paulo and Kolkata (34/34
+each), but Node on Windows ignores TZ, so those runs all used the machine's US Pacific zone. That zone
+does put the biweekly test across the 2026-03-08 DST change.
+
+============================================================
+TYPECHECK / LINT / BUILD
+============================================================
+- npx tsc --noEmit: pass, no errors. This also typechecks tests/, since tsconfig includes **/*.ts.
+- npx next lint: "No ESLint warnings or errors".
+- npx next build: compiled successfully; all 6 static pages generated, including the new
+  "/recurring" route (2.86 kB, 102 kB first-load JS).
+- The app was NOT run, as instructed: no UI behavior was checked in a browser.
+
+============================================================
+KNOWN LIMITATIONS
+============================================================
+- Rule edits never backfill. Moving the start date earlier, or changing the frequency, doesn't create
+  occurrences on or before the last generation date (normally today). Changes apply from tomorrow on.
+- Occurrences missed while a rule was paused are skipped on resume, not backfilled (by design).
+- A start date decades in the past fills in 200 expenses per run. The user continues via the toast's
+  "Continue" action or on later loads; for example, a weekly rule from 1990 takes about 10 runs.
+- Generation runs on load, after rule save/resume, and on visibilitychange. A tab left visible across
+  midnight won't generate the new day's occurrence until one of those happens.
+- Cross-tab writes are last-writer-wins, as in the existing app. Duplicate generated expenses are
+  impossible because ids are deterministic. An unrelated edit made in another tab at the same instant
+  could still be overwritten, as before.
+- The Expenses list and dashboard don't visually mark generated expenses. You can only tell them apart
+  by id, which CSV export doesn't include. A badge in ExpenseList would be easy to add but would touch
+  another shared component.
+- After "Delete rule, keep expenses", the kept expenses still carry the recurring id prefix of a rule
+  that no longer exists. This is harmless.
+- The UI was not exercised in a browser; it is only verified by typecheck, lint and build.
+
+============================================================
+INTEGRATION NOTES (likely merge conflicts)
+============================================================
+- components/providers/ExpenseProvider.tsx: the most likely conflict. Other branches that add context
+  methods will touch the same interface block, the end of the callbacks section, and especially the
+  value useMemo object and its single-line dependency array. To resolve, keep both sets of
+  members/deps. Keep "return error;" at the end of commit(). If another branch also changed commit(),
+  keep its changes, as long as commit() still returns the save error (string | null).
+- app/layout.tsx: a conflict is possible if another branch adds a provider or changes <main>.
+  RecurringProvider must stay inside ExpenseProvider and ToastProvider (it uses useExpenses and
+  useToast). Wrapping only {children} is enough; it can also wrap a larger subtree.
+- The main checkout's CLAUDE.md (C:\Repositories\expense-tracker-ai) already describes an Export Hub
+  feature: CloudProvider inside ExpenseProvider in app/layout.tsx, an /exports route, and the key
+  "expense-tracker:cloud:v1".
+  - Expect conflicts in app/layout.tsx and the Navbar LINKS array with that branch. Keep both
+    providers; their order relative to each other doesn't matter.
+  - Its export templates read the expense list, so generated recurring expenses are included
+    automatically.
+- components/layout/Navbar.tsx: the LINKS array is a near-certain conflict if other features add nav
+  items. Keep all entries and merge the lucide-react import list. With 4+ links, the sr-only label change
+  is needed even more on mobile. If another branch changed the label rendering, keep a version where
+  labels collapse at narrow widths.
+- New files have no conflicts. lib/types.ts, lib/storage.ts and CLAUDE.md are untouched.
+- Suggested follow-up for CLAUDE.md, done once all branches are merged, to avoid a conflict now:
+  - add RecurringProvider to the provider nesting description;
+  - list lib/recurring.ts and lib/recurringStorage.ts under lib/;
+  - document the "expense-tracker:recurring:v1" key and the "recurring:<ruleId>:<date>" expense id
+    convention;
+  - document the node:test command above.
+- If another branch changes the Expense shape (and bumps the key or adds a migration), generated
+  expenses must be updated too. They are built in one place: generateDueExpenses() in lib/recurring.ts
+  (the object literal pushed into `expenses`).
+- If another branch introduces a test runner later, tests/recurring-expenses.test.ts uses only node:test
+  and node:assert/strict and should port trivially.

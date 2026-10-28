@@ -1,0 +1,63 @@
+BUDGETS FEATURE - WORK SUMMARY
+Worktree: C:\Repositories\expense-tracker-budgets (branch feature/budgets, from main). Nothing committed or pushed.
+
+WHAT WAS IMPLEMENTED
+- Optional monthly budget per category plus an optional overall monthly budget (covers all spending, including unbudgeted categories).
+- Dashboard "Budgets" card (directly below the summary cards) for the current calendar month:
+  - Header shows the month and "day N of M".
+  - One row per budgeted item (Overall first, highlighted; then categories in CATEGORIES order): icon, "$spent of $budget spent (NN%)", a progress bar, and a status line with icon + text.
+  - Statuses: On track ($X left); On pace to exceed ($X left, on pace for $P); Budget used up (spent exactly == budget); Over budget ($X over). Color is never the only signal: every status has a text label and an icon.
+  - Pace projection: spent / dayOfMonth * daysInMonth (today counts as elapsed). On the last day the projection equals actual spending.
+  - Progress bars use role="progressbar" with aria-valuenow (capped at 100) and an aria-valuetext containing the full text summary and status.
+- "Set budgets" / "Edit budgets" button opens a native <dialog> modal (components/ui/Modal.tsx) with a form: overall field + one labelled field per category, blank = no budget. Validation: positive numbers, max 2 decimals, > $0, <= $1,000,000, with per-field error messages linked via aria-describedby, focus moved to the first invalid field on submit, values normalized to 2 decimals on blur (same pattern as ExpenseForm). Shows a live note with the total of category budgets and warns (non-blocking) if they exceed the overall budget. "Clear all" empties every field; saving an empty form clears budgets.
+- Empty states: "No budgets yet" (EmptyState with Set budgets button) when nothing is configured; "No spending yet this month" note when budgets exist but this month has no expenses (rows then show $0 spent / full budget left). The card only appears when the dashboard has any expenses at all (the existing dashboard-wide "No expenses yet" empty state is unchanged).
+- Persistence in its own versioned key with schema checks that drop malformed entries (invalid/unknown categories, non-numbers, <= 0, > max, more than 2 decimals, wrong container types) and count them; corrupted JSON / wrong top-level type yields empty budgets + an error. localStorage unavailable on read and quota/private-mode failures on write are caught and surfaced as toasts. Cross-tab sync via the `storage` event. Skipped-record and error toasts are reported once (StrictMode-safe), mirroring ExpenseProvider.
+
+FILES CREATED
+- lib/budgets.ts - pure logic (framework-free): Budgets type, BUDGETS_STORAGE_KEY, MAX_BUDGET, EMPTY_BUDGETS, hasAnyBudget; parseStoredBudgets/loadBudgets/saveBudgets; BudgetFormValues/BudgetFormErrors, toBudgetFormValues, validateBudgetAmount, validateBudgetForm, hasBudgetFormErrors, toBudgets, sumCategoryBudgetInputs; getMonthPace, projectMonthEnd, getBudgetStatus, getBudgetSummary (BudgetProgress/BudgetSummary types). Imports only lib/analytics, lib/format, lib/types (no lucide), so tests need no NODE_PATH.
+- components/budgets/useBudgets.ts - "use client" hook: load on mount, cross-tab sync, commit() that writes synchronously and toasts on failure.
+- components/budgets/BudgetForm.tsx - the budget edit form.
+- components/budgets/BudgetOverview.tsx - dashboard card + edit modal.
+- tests/budgets.test.ts - node:test suite (52 tests).
+
+FILES MODIFIED
+- components/dashboard/DashboardView.tsx (SHARED) - +4 lines only: one import of BudgetOverview and one `<div className="mt-6"><BudgetOverview expenses={expenses} /></div>` block inserted between <SummaryCards> and the charts grid. Needed to show the card on the dashboard.
+- No other shared files touched: lib/types.ts, app/layout.tsx, Navbar.tsx, tailwind.config.ts, package.json, CLAUDE.md are unchanged. Budget state is owned by a hook inside the card rather than a layout-level provider precisely to avoid editing app/layout.tsx.
+
+DEPENDENCIES ADDED
+- none
+
+STORAGE KEYS ADDED
+- expense-tracker:budgets:v1  -> JSON { "overall": number | null, "categories": { "<Category>": number, ... } }
+  (Expense shape and expense-tracker:expenses:v1 untouched.)
+
+TESTING APPROACH
+Commands (Git Bash, from the worktree):
+  npx tsc --outDir "$TEMP/budgets-test-build" --rootDir . --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop tests/budgets.test.ts
+  node --test "$TEMP/budgets-test-build/tests/"*.test.js
+Note: on Node 24, `node --test "<dir>"` tried to load the directory as a module and failed (MODULE_NOT_FOUND); passing the compiled file / glob works.
+Result: tests 52, suites 9, pass 52, fail 0.
+Coverage: month pace (mid-month, first day, last day, Feb leap/non-leap, 31-day month); projection (linear, first-day extrapolation, last day == spent, zero, cent rounding); status (on track, projection exactly at budget, on pace over, exactly at budget, over); summary (no budgets, zero spending this month, month/category scoping incl. adjacent months, exactly-at-budget with 0.1+0.2 float drift, over budget with negative remaining and uncapped percent, overall includes unbudgeted categories, ordering); storage parsing (null/empty, round-trip, corrupted JSON, wrong top-level types, mixed malformed entries dropped + counted, 1e400 overflow, wrong categories type, missing fields, __proto__/constructor keys); load/save with fake window.localStorage (round trip, getItem throws, no window, setItem quota error); input validation (blank, valid forms, non-numeric/negative/3 decimals/exponent/commas/$, zero, above max); form conversion (fill, per-field errors, all-blank clears, parse/trim/omit blanks, round-trip, category sum).
+
+TYPECHECK/LINT/BUILD RESULTS
+- npx tsc --noEmit: pass, no errors.
+- npx next lint: "No ESLint warnings or errors".
+- npx next build: compiled successfully, 5/5 static pages; / is 115 kB (217 kB first load).
+- App was NOT run (per instructions), so the UI is verified by typecheck/build only, not visually/in a browser.
+
+KNOWN LIMITATIONS
+- Budgets are a single set applied to every month (no per-month history or rollover); progress is always for the current calendar month.
+- Pace projection is a naive straight line; early in the month (especially day 1) a single purchase can flag "on pace to exceed". Large one-off bills (rent) skew it.
+- "Exactly at budget" uses strict equality on cent-rounded values (sums go through sumAmounts, so this is reliable).
+- The card is not shown when there are zero expenses overall (dashboard's existing empty state takes over), so budgets can't be set before the first expense is added.
+- The month/day is computed at render time; a dashboard left open past midnight on the last day won't roll over until something re-renders/reloads.
+- Category-sum > overall budget is a non-blocking warning only.
+- Budget state is local to the card's hook (not app-wide context); if another page later needs budgets it should lift useBudgets into a provider.
+
+INTEGRATION NOTES
+- Only shared-file conflict risk: components/dashboard/DashboardView.tsx. Other branches adding dashboard widgets will likely touch the same import block and the JSX between <SummaryCards> and the charts grid. Resolution: keep both imports (alphabetical by path, BudgetOverview sorts first under @/components/budgets) and keep each feature's block; order of the mt-6 sections is cosmetic.
+- If another branch adds a category to CATEGORIES/CATEGORY_META, budgets pick it up automatically (form fields, parsing, summary all iterate CATEGORIES). Previously stored budgets for a removed category are dropped by parseStoredBudgets and counted as skipped.
+- If another branch adds an import/export or "clear all data" feature, it should decide whether to include expense-tracker:budgets:v1.
+- If another branch introduces a settings page or app-wide provider, useBudgets can be lifted into a provider in app/layout.tsx without changing lib/budgets.ts.
+- tests/ is a new directory; if other branches add tests there, no conflicts unless they use the same filename. No package.json changes.
+- Suggested CLAUDE.md addition at merge time (not made, to avoid conflicts): mention lib/budgets.ts in the Layers list and the expense-tracker:budgets:v1 key.
