@@ -10,7 +10,12 @@ import { Card, Skeleton } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Menu } from "@/components/ui/Menu";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ExportSheet } from "@/components/export/ExportSheet";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
+import type { ExportScope } from "@/lib/export";
+import { formatCurrency } from "@/lib/format";
+import { generateSampleExpenses } from "@/lib/sampleData";
+import { CATEGORIES, type ExpenseFilters, type SortState } from "@/lib/types";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
 import { formatCurrency, formatDate, todayISO } from "@/lib/format";
 import type { ExpenseFilters, SortState } from "@/lib/types";
@@ -71,6 +76,12 @@ export function ExpensesView() {
     setVisibleCount(PAGE_SIZE);
   };
 
+  const [exportOpen, setExportOpen] = useState(false);
+  // The export starts from the list's date and category filters; search text is a lookup aid, not a scope.
+  const exportScope: ExportScope = {
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    categories: filters.category === "All" ? [...CATEGORIES] : [filters.category],
   const handleExport = () => {
     // An unfiltered export is a full backup; route it through exportAll so the backup status updates.
     if (visible.length === expenses.length) return exportAll();
@@ -98,6 +109,11 @@ export function ExpensesView() {
         actions={
           hasExpenses && (
             <>
+              <Button variant="ghost" onClick={handleClearAll}>
+                <Trash2 className="h-4 w-4" aria-hidden /> Delete all
+              </Button>
+              <Button variant="secondary" onClick={() => setExportOpen(true)} aria-haspopup="dialog">
+                <Download className="h-4 w-4" aria-hidden /> Export…
               <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
                 <Download className="h-4 w-4" aria-hidden />
                 {isFiltered ? `Export ${visible.length.toLocaleString()} shown` : "Export CSV"}
@@ -183,6 +199,8 @@ export function ExpensesView() {
           </>
         )}
       </Card>
+
+      <ExportSheet open={exportOpen} onClose={() => setExportOpen(false)} initialScope={exportScope} />
     </>
   );
 }
