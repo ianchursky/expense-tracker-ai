@@ -1,5 +1,6 @@
 "use client";
 
+import { clsx } from "clsx";
 import { X } from "lucide-react";
 import { useEffect, useId, useRef, type ReactNode } from "react";
 
@@ -8,11 +9,13 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   description?: string;
+  /** "md" fits forms; "lg" fits multi-step flows with previews. */
+  size?: "md" | "lg";
   children: ReactNode;
 }
 
 /** Thin wrapper around the native <dialog> element, which provides focus trapping and Esc-to-close. */
-export function Modal({ open, onClose, title, description, children }: ModalProps) {
+export function Modal({ open, onClose, title, description, size = "md", children }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -36,7 +39,10 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
+      className={clsx(
+        "w-[calc(100%-2rem)] rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
+        size === "lg" ? "max-w-2xl" : "max-w-lg",
+      )}
     >
       {open && (
         <div className="p-5 sm:p-6">

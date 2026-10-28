@@ -1,15 +1,17 @@
 "use client";
 
 import { clsx } from "clsx";
-import { LayoutDashboard, List, Plus, Wallet } from "lucide-react";
+import { LayoutDashboard, List, Plus, Share2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SyncIndicator } from "@/components/cloud/SyncIndicator";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { Button } from "@/components/ui/Button";
 
 const LINKS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/expenses", label: "Expenses", icon: List },
+  { href: "/exports", label: "Exports", icon: Share2 },
 ];
 
 export function Navbar() {
@@ -40,13 +42,16 @@ export function Navbar() {
                 )}
               >
                 <Icon className="h-4 w-4" aria-hidden />
-                {label}
+                <span className="sr-only sm:not-sr-only">{label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <Button onClick={openAdd} className="ml-auto" aria-label="Add expense">
+        <div className="ml-auto">
+          <SyncIndicator variant="nav" />
+        </div>
+        <Button onClick={openAdd} aria-label="Add expense">
           <Plus className="h-4 w-4" aria-hidden />
           <span className="hidden sm:inline">Add expense</span>
         </Button>

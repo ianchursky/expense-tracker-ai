@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Plus, Receipt, SearchX, Sparkles, Trash2 } from "lucide-react";
+import { Plus, Receipt, SearchX, Share2, Sparkles, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
@@ -10,8 +10,8 @@ import { Card, Skeleton } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
-import { downloadCSV, expensesToCSV } from "@/lib/csv";
-import { formatCurrency, todayISO } from "@/lib/format";
+import { ExportComposer } from "@/components/cloud/ExportComposer";
+import { formatCurrency } from "@/lib/format";
 import { generateSampleExpenses } from "@/lib/sampleData";
 import type { ExpenseFilters, SortState } from "@/lib/types";
 import { ExpenseFiltersBar } from "./ExpenseFiltersBar";
@@ -48,19 +48,12 @@ export function ExpensesView() {
     setVisibleCount(PAGE_SIZE);
   };
 
-  const handleExport = () => {
-    try {
-      downloadCSV(`expenses-${todayISO()}.csv`, expensesToCSV(visible));
-      toast(`Exported ${visible.length} expense${visible.length === 1 ? "" : "s"} to CSV.`);
-    } catch {
-      toast("Export failed. Please try again.", "error");
-    }
-  };
+  const [composerOpen, setComposerOpen] = useState(false);
 
   const handleClearAll = () =>
     confirm({
       title: "Delete all expenses?",
-      message: `This permanently removes all ${expenses.length} expenses from this browser. Export a CSV first if you want a backup.`,
+      message: `This permanently removes all ${expenses.length} expenses from this browser. Export a Full Backup first if you want to keep a copy.`,
       confirmLabel: "Delete all",
       onConfirm: () => {
         clearAll();
@@ -87,8 +80,8 @@ export function ExpensesView() {
               <Button variant="ghost" onClick={handleClearAll}>
                 <Trash2 className="h-4 w-4" aria-hidden /> Delete all
               </Button>
-              <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
-                <Download className="h-4 w-4" aria-hidden /> Export CSV
+              <Button variant="secondary" onClick={() => setComposerOpen(true)} aria-haspopup="dialog">
+                <Share2 className="h-4 w-4" aria-hidden /> Export &amp; share
               </Button>
             </>
           )
@@ -152,6 +145,8 @@ export function ExpensesView() {
           </>
         )}
       </Card>
+
+      <ExportComposer open={composerOpen} onClose={() => setComposerOpen(false)} preset={{}} />
     </>
   );
 }
