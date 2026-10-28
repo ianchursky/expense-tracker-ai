@@ -3,10 +3,13 @@ import { Inter } from "next/font/google";
 import { CloudProvider } from "@/components/cloud/CloudProvider";
 import { JobTray } from "@/components/cloud/JobTray";
 import { Navbar } from "@/components/layout/Navbar";
+import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
+import { StorageStatus } from "@/components/layout/StorageStatus";
 import { StorageWarning } from "@/components/layout/StorageWarning";
 import { ExpenseDialogProvider } from "@/components/providers/ExpenseDialogProvider";
 import { ExpenseProvider } from "@/components/providers/ExpenseProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { brand } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -20,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#4f46e5",
+  themeColor: brand[600],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -38,6 +41,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </main>
                 <JobTray />
               </CloudProvider>
+              <Navbar />
+              <div className="lg:pl-60">
+                <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:py-8">
+                  <StorageWarning />
+                  <SampleDataNotice />
+                  {children}
+                  <div className="mt-8 lg:hidden">
+                    <StorageStatus variant="inline" />
+                  </div>
+                </main>
+              </div>
             </ExpenseDialogProvider>
           </ExpenseProvider>
         </ToastProvider>

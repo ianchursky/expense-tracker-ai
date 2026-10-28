@@ -1,9 +1,10 @@
 "use client";
 
 import { clsx } from "clsx";
-import { ArrowDown, ArrowUp, ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronRight, Pencil, Trash2 } from "lucide-react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
-import { CategoryBadge, CategoryIcon } from "@/components/ui/CategoryBadge";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { CATEGORY_META } from "@/lib/categories";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Expense, SortField, SortState } from "@/lib/types";
 
@@ -58,6 +59,34 @@ function SortHeader({
   );
 }
 
+function MobileRow({ expense: e }: { expense: Expense }) {
+  const { openEdit } = useExpenseDialogs();
+  return (
+    <button
+      type="button"
+      onClick={() => openEdit(e)}
+      className="flex min-h-[60px] w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-slate-50 focus-visible:-outline-offset-2"
+    >
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-slate-900">
+          <span className="sr-only">Edit </span>
+          {e.description}
+        </p>
+        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-600">
+          <span
+            className="h-2 w-2 shrink-0 rounded-full"
+            style={{ backgroundColor: CATEGORY_META[e.category].color }}
+            aria-hidden
+          />
+          {e.category} · {formatDate(e.date)}
+        </p>
+      </div>
+      <span className="shrink-0 text-sm font-semibold text-slate-900 tabular-nums">{formatCurrency(e.amount)}</span>
+      <ChevronRight className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+    </button>
+  );
+}
+
 function RowActions({ expense }: { expense: Expense }) {
   const { openEdit, requestDelete } = useExpenseDialogs();
   return (
@@ -65,7 +94,7 @@ function RowActions({ expense }: { expense: Expense }) {
       <button
         type="button"
         onClick={() => openEdit(expense)}
-        className="rounded-md p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+        className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
         aria-label={`Edit ${expense.description}`}
         title="Edit"
       >
@@ -74,7 +103,7 @@ function RowActions({ expense }: { expense: Expense }) {
       <button
         type="button"
         onClick={() => requestDelete(expense)}
-        className="rounded-md p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
+        className="rounded-md p-2 text-slate-500 hover:bg-red-50 hover:text-red-600"
         aria-label={`Delete ${expense.description}`}
         title="Delete"
       >
@@ -123,21 +152,11 @@ export function ExpenseList({ expenses, sort, onSortChange }: ExpenseListProps) 
         </tbody>
       </table>
 
-      {/* Mobile: stacked cards */}
+      {/* Mobile: each row is one full-width edit target; delete lives in the edit dialog. */}
       <ul className="divide-y divide-slate-100 border-t border-slate-200 md:hidden">
         {expenses.map((e) => (
-          <li key={e.id} className="flex items-center gap-3 px-4 py-3">
-            <CategoryIcon category={e.category} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="truncate text-sm font-medium text-slate-900">{e.description}</p>
-                <p className="shrink-0 text-sm font-semibold text-slate-900 tabular-nums">{formatCurrency(e.amount)}</p>
-              </div>
-              <p className="text-xs text-slate-500">
-                {e.category} · {formatDate(e.date)}
-              </p>
-            </div>
-            <RowActions expense={e} />
+          <li key={e.id}>
+            <MobileRow expense={e} />
           </li>
         ))}
       </ul>
