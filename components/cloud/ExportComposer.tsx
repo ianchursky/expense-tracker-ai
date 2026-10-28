@@ -11,7 +11,7 @@ import { DESTINATIONS, getDestination } from "@/lib/cloud/destinations";
 import { TEMPLATES, defaultPeriod, describePeriod, getTemplate } from "@/lib/cloud/templates";
 import { filenameFor } from "@/lib/cloud/serialize";
 import type { DestinationDetails, DestinationId, FileFormat, Period, TemplateId, TemplateOutput } from "@/lib/cloud/types";
-import { formatMonthKey, monthKey } from "@/lib/format";
+import { formatMonthKey, monthKey, todayISO } from "@/lib/format";
 import { DemoBadge } from "./DemoBadge";
 import { useCloud } from "./CloudProvider";
 
@@ -67,7 +67,7 @@ function ComposerBody({ onClose, preset }: { onClose: () => void; preset: Compos
   const [step, setStep] = useState<Step>(0);
   const [templateId, setTemplateId] = useState<TemplateId>(preset.templateId ?? "monthly-summary");
   const template = getTemplate(templateId);
-  const [period, setPeriod] = useState<Period>(() => defaultPeriod(template));
+  const [period, setPeriod] = useState<Period>(() => defaultPeriod(template, expenses));
   const [format, setFormat] = useState<FileFormat>(template.defaultFormat);
   const [destinationId, setDestinationId] = useState<DestinationId>(preset.destinationId ?? "download");
   const [details, setDetails] = useState<DestinationDetails>(() => defaultDetails(preset.destinationId ?? "download", template.name));
@@ -77,15 +77,17 @@ function ComposerBody({ onClose, preset }: { onClose: () => void; preset: Compos
   const destination = getDestination(destinationId);
 
   // Template switch: reset period and format to what that template expects.
-  useEffect(() => {
-    setPeriod(defaultPeriod(template));
-    setFormat(template.defaultFormat);
-  }, [template]);
+  const chooseTemplate = (id: TemplateId) => {
+    const next = getTemplate(id);
+    setTemplateId(id);
+    setPeriod(defaultPeriod(next, expenses));
+    setFormat(next.defaultFormat);
+  };
   useEffect(() => setDetails(defaultDetails(destinationId, template.name)), [destinationId, template.name]);
 
   const output = useMemo(() => template.build(expenses, period), [template, expenses, period]);
   const years = useMemo(() => [...new Set([String(new Date().getFullYear()), ...expenses.map((e) => e.date.slice(0, 4))])].sort().reverse(), [expenses]);
-  const months = useMemo(() => [...new Set([monthKey(new Date().toISOString().slice(0, 10)), ...expenses.map((e) => monthKey(e.date))])].sort().reverse().slice(0, 18), [expenses]);
+  const months = useMemo(() => [...new Set([monthKey(todayISO()), ...expenses.map((e) => monthKey(e.date))])].sort().reverse().slice(0, 18), [expenses]);
 
   const recipients = recipientsText.split(/[,\s;]+/).filter(Boolean);
   const badRecipient = recipients.find((r) => !EMAIL.test(r));
@@ -153,7 +155,7 @@ function ComposerBody({ onClose, preset }: { onClose: () => void; preset: Compos
                     checked ? "border-brand-600 bg-brand-50/60" : "border-slate-200 hover:bg-slate-50",
                   )}
                 >
-                  <input type="radio" name="template" className="sr-only" checked={checked} onChange={() => setTemplateId(t.id)} />
+                  <input type="radio" name="template" className="sr-only" checked={checked} onChange={() => chooseTemplate(t.id)} />
                   <span className={clsx("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", t.tint)}>
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>

@@ -162,10 +162,17 @@ export const TEMPLATES: ExportTemplate[] = [
 
 export const getTemplate = (id: TemplateId) => TEMPLATES.find((t) => t.id === id)!;
 
-/** Sensible starting period for a template: the latest complete year, the current month, or all time. */
-export function defaultPeriod(template: ExportTemplate, now = new Date()): Period {
+/**
+ * Sensible starting period for a template: the latest complete year, the current month, or all time.
+ * A year falls back to the current one when the last complete year has no expenses (a new user's first year).
+ */
+export function defaultPeriod(template: ExportTemplate, expenses: Expense[], now = new Date()): Period {
   const kind = template.periodKinds[0];
-  if (kind === "year") return { kind, value: String(now.getFullYear()) };
+  if (kind === "year") {
+    const lastYear = String(now.getFullYear() - 1);
+    const hasLastYear = expenses.some((e) => e.date.startsWith(`${lastYear}-`));
+    return { kind, value: hasLastYear ? lastYear : String(now.getFullYear()) };
+  }
   if (kind === "month") return { kind, value: monthKey(toISODate(now)) };
   return { kind: "all" };
 }

@@ -3,6 +3,7 @@
 import { clsx } from "clsx";
 import { AlertCircle, CalendarClock, CheckCircle2, Info, Link2, Play, Plus, RotateCcw, Send, Trash2, XCircle } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useExpenses } from "@/components/providers/ExpenseProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,6 +11,7 @@ import { DESTINATIONS, getDestination } from "@/lib/cloud/destinations";
 import { describeCadence, nextRunAt, relativeTime } from "@/lib/cloud/schedule";
 import { TEMPLATES, defaultPeriod, describePeriod, getTemplate } from "@/lib/cloud/templates";
 import type { DestinationId } from "@/lib/cloud/types";
+import { monthKey, toISODate, todayISO } from "@/lib/format";
 import { useCloud } from "./CloudProvider";
 import { ConnectDialog } from "./ConnectDialog";
 import { DemoBadge } from "./DemoBadge";
@@ -36,11 +38,12 @@ const formatBytes = (n: number) => (n < 1024 ? `${n} B` : `${(n / 1024).toFixed(
 
 export function ExportHubView() {
   const cloud = useCloud();
+  const { expenses } = useExpenses();
   const [composer, setComposer] = useState<ComposerPreset | null>(null);
   const [connectId, setConnectId] = useState<DestinationId | null>(null);
   const [scheduling, setScheduling] = useState(false);
-  const now = new Date();
-  const thisMonth = cloud.history.filter((h) => h.finishedAt.slice(0, 7) === now.toISOString().slice(0, 7) && h.status === "completed").length;
+  const currentMonth = monthKey(todayISO());
+  const thisMonth = cloud.history.filter((h) => h.status === "completed" && monthKey(toISODate(new Date(h.finishedAt))) === currentMonth).length;
   const activeSchedules = cloud.schedules.filter((s) => s.enabled).length;
   const cloudDestinations = DESTINATIONS.filter((d) => d.group === "cloud");
 
@@ -91,7 +94,7 @@ export function ExportHubView() {
                 <h3 className="mt-4 font-semibold text-slate-900">{t.name}</h3>
                 <p className="mt-1 flex-1 text-sm text-slate-600">{t.purpose}</p>
                 <p className="mt-3 text-xs text-slate-500">
-                  {describePeriod(defaultPeriod(t))} · {t.defaultFormat.toUpperCase()}
+                  {describePeriod(defaultPeriod(t, expenses))} · {t.defaultFormat.toUpperCase()}
                 </p>
                 <div className="mt-4 flex gap-2">
                   <Button size="sm" className="flex-1" onClick={() => setComposer({ templateId: t.id })}>
@@ -200,7 +203,7 @@ export function ExportHubView() {
                       onClick={() =>
                         cloud.startExport({
                           templateId: s.templateId,
-                          period: defaultPeriod(getTemplate(s.templateId)),
+                          period: defaultPeriod(getTemplate(s.templateId), expenses),
                           format: s.format,
                           destinationId: s.destinationId,
                           details: s.details,

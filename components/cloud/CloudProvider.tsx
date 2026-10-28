@@ -240,7 +240,7 @@ export function CloudProvider({ children }: { children: ReactNode }) {
         const template = getTemplate(s.templateId);
         startExport({
           templateId: s.templateId,
-          period: defaultPeriod(template, now),
+          period: defaultPeriod(template, expensesRef.current, now),
           format: s.format,
           destinationId: s.destinationId,
           details: s.details,
