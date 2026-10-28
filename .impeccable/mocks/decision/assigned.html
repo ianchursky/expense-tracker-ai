@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Personal Annual Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400;62..125,500;62..125,700;62..125,800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#111;--paper:#fbfbf9;--red:#e2231a;--rule:#111;--mute:#6b6b6b;--food:#e2231a;--bills:#1f4bd8;--trans:#0f8a5f;--shop:#d9a400;--ent:#7a3fb0;--oth:#9a9a9a}
+html,body{width:1440px;height:900px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:Archivo,sans-serif;font-variant-numeric:tabular-nums}
+.band{height:64px;background:var(--red);color:#fff;display:flex;align-items:center;padding:0 56px;gap:48px}
+.mark{font-weight:800;font-stretch:112%;font-size:18px;letter-spacing:-.01em}
+.nav{display:flex;gap:32px;font-size:15px;font-weight:500}
+.nav a{color:#fff;text-decoration:none;padding:21px 0;border-bottom:3px solid transparent}
+.nav a.on{border-color:#fff}
+.add{margin-left:auto;background:#fff;color:var(--red);font-weight:700;font-size:14px;padding:10px 18px;border:0}
+.page{display:grid;grid-template-columns:repeat(12,1fr);column-gap:32px;padding:44px 56px 0}
+.k{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.lead{grid-column:1/8;border-top:2px solid var(--ink);padding-top:14px}
+.fig{font-size:156px;font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.92;margin-top:18px}
+.fig small{font-size:64px;letter-spacing:-.02em}
+.sub{font-size:20px;margin-top:16px;max-width:620px;line-height:1.35}
+sup{color:var(--red);font-weight:700;font-size:12px;margin-left:2px}
+.cat{grid-column:8/13;border-top:2px solid var(--ink);padding-top:14px}
+.bar{display:flex;height:30px;margin:22px 0 18px}
+.bar i{display:block;height:100%}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td{padding:9px 0;border-top:1px solid #d6d6d2}
+td.n{width:28px;color:var(--mute);font-size:12px}
+td.amt{text-align:right;font-weight:500}
+td.pc{text-align:right;width:52px;color:var(--mute)}
+.sw{display:inline-block;width:10px;height:10px;margin-right:10px;vertical-align:0}
+.row2{grid-column:1/13;display:grid;grid-template-columns:repeat(12,1fr);column-gap:32px;margin-top:40px}
+.trend{grid-column:1/8;border-top:1px solid var(--rule);padding-top:14px}
+.cols{display:flex;align-items:flex-end;gap:28px;height:170px;margin-top:20px;border-bottom:1px solid var(--ink)}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch}
+.col b{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+.col span{display:block;background:#c9c9c4}
+.col.now span{background:var(--ink)}
+.months{display:flex;gap:28px;font-size:12px;color:var(--mute);margin-top:8px}.months div{flex:1}
+.latest{grid-column:8/13;border-top:1px solid var(--rule);padding-top:14px}
+.latest td{font-size:14px}.latest .d{color:var(--mute);width:64px}
+.colo{position:absolute;left:56px;right:56px;bottom:22px;border-top:1px solid var(--ink);padding-top:12px;display:flex;gap:28px;font-size:13px}
+.colo b{font-weight:700}.colo .x{margin-left:auto;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.fn{color:var(--red);font-weight:700}
+</style></head><body>
+<header class="band"><span class="mark">Expense Tracker</span>
+<nav class="nav"><a class="on" href="#">Dashboard</a><a href="#">Expenses</a></nav>
+<button class="add">+ Add expense</button></header>
+<main class="page">
+<section class="lead"><div class="k">October 2026 · spent so far</div>
+<div class="fig">$992<small>.09</small></div>
+<p class="sub">4.4% more than all of September, with 4 days still to go.<sup>1</sup> Food is half of it.<sup>2</sup></p></section>
+<section class="cat"><div class="k">Where it went · October</div>
+<div class="bar"><i style="width:49%;background:var(--food)"></i><i style="width:21.2%;background:var(--bills)"></i><i style="width:12.9%;background:var(--trans)"></i><i style="width:9.4%;background:var(--shop)"></i><i style="width:4.9%;background:var(--ent)"></i><i style="width:2.6%;background:var(--oth)"></i></div>
+<table><tr><td class="n">01</td><td><i class="sw" style="background:var(--food)"></i>Food</td><td class="amt">$486.15</td><td class="pc">49%</td></tr>
+<tr><td class="n">02</td><td><i class="sw" style="background:var(--bills)"></i>Bills</td><td class="amt">$210.19</td><td class="pc">21%</td></tr>
+<tr><td class="n">03</td><td><i class="sw" style="background:var(--trans)"></i>Transportation</td><td class="amt">$128.40</td><td class="pc">13%</td></tr>
+<tr><td class="n">04</td><td><i class="sw" style="background:var(--shop)"></i>Shopping</td><td class="amt">$93.30</td><td class="pc">9%</td></tr>
+<tr><td class="n">05</td><td><i class="sw" style="background:var(--ent)"></i>Entertainment</td><td class="amt">$49.06</td><td class="pc">5%</td></tr></table></section>
+<div class="row2">
+<section class="trend"><div class="k">Six months</div>
+<div class="cols">
+<div class="col"><b>$955</b><span style="height:126px"></span></div><div class="col"><b>$901</b><span style="height:119px"></span></div>
+<div class="col"><b>$1,005</b><span style="height:133px"></span></div><div class="col"><b>$938</b><span style="height:124px"></span></div>
+<div class="col"><b>$951</b><span style="height:126px"></span></div><div class="col now"><b>$992</b><span style="height:131px"></span></div></div>
+<div class="months"><div>May</div><div>Jun</div><div>Jul</div><div>Aug</div><div>Sep</div><div><b>Oct</b></div></div></section>
+<section class="latest"><div class="k">Latest entries</div>
+<table style="margin-top:12px">
+<tr><td class="d">Oct 26</td><td>Gas</td><td class="amt">$64.53</td></tr>
+<tr><td class="d">Oct 25</td><td>Lunch with coworkers</td><td class="amt">$27.23</td></tr>
+<tr><td class="d">Oct 25</td><td>Electricity bill</td><td class="amt">$99.20</td></tr>
+<tr><td class="d">Oct 23</td><td>Lunch with coworkers</td><td class="amt">$26.97</td></tr>
+<tr><td class="d">Oct 23</td><td>Movie tickets</td><td class="amt">$23.07</td></tr></table></section></div>
+</main>
+<footer class="colo"><span><b>Printed for one reader.</b> Stored only in this browser; nothing is uploaded.</span><span>128 entries · Last export: never</span><span><span class="fn">1</span> Oct 1–27 vs. Sep 1–30 &nbsp; <span class="fn">2</span> 9 entries</span><span class="x">Export CSV</span></footer>
+</body></html>

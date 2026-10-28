@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T00:00:00Z",
+  "title": "Design System: Expense Tracker",
+  "extensions": {
+    "colorMeta": {
+      "ledger-green": { "role": "primary", "displayName": "Ledger Green", "canonical": "#15803d", "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#4ade80", "#bbf7d0", "#f0fdf4"] },
+      "ledger-green-deep": { "role": "primary", "displayName": "Ledger Green Deep", "canonical": "#166534", "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#4ade80", "#bbf7d0", "#f0fdf4"] },
+      "ledger-green-data": { "role": "primary", "displayName": "Ledger Green Data", "canonical": "#16a34a", "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#4ade80", "#bbf7d0", "#f0fdf4"] },
+      "ledger-green-tint": { "role": "primary", "displayName": "Ledger Green Tint", "canonical": "#dcfce7", "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#4ade80", "#dcfce7", "#f0fdf4"] },
+      "ledger-green-wash": { "role": "primary", "displayName": "Ledger Green Wash", "canonical": "#f0fdf4", "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#4ade80", "#dcfce7", "#f0fdf4"] },
+      "slate-ground": { "role": "neutral", "displayName": "Slate Ground", "canonical": "#f8fafc", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "card-white": { "role": "neutral", "displayName": "Card White", "canonical": "#ffffff", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#f1f5f9", "#ffffff"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "#e2e8f0", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "divider": { "role": "neutral", "displayName": "Divider", "canonical": "#f1f5f9", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#f1f5f9", "#f8fafc"] },
+      "control-stroke": { "role": "neutral", "displayName": "Control Stroke", "canonical": "#cbd5e1", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "muted-icon": { "role": "neutral", "displayName": "Muted Icon", "canonical": "#64748b", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "secondary-ink": { "role": "neutral", "displayName": "Secondary Ink", "canonical": "#475569", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "label-ink": { "role": "neutral", "displayName": "Label Ink", "canonical": "#334155", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0f172a", "tonalRamp": ["#020617", "#0f172a", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] },
+      "delta-up-red": { "role": "semantic", "displayName": "Delta Up Red", "canonical": "#b91c1c", "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#fca5a5", "#fee2e2", "#fef2f2"] },
+      "danger-red": { "role": "semantic", "displayName": "Danger Red", "canonical": "#dc2626", "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#fca5a5", "#fee2e2", "#fef2f2"] },
+      "warning-wash": { "role": "semantic", "displayName": "Warning Wash", "canonical": "#fffbeb", "tonalRamp": ["#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fcd34d", "#fef3c7", "#fffbeb"] },
+      "warning-ink": { "role": "semantic", "displayName": "Warning Ink", "canonical": "#92400e", "tonalRamp": ["#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fcd34d", "#fef3c7", "#fffbeb"] },
+      "category-food": { "role": "tertiary", "displayName": "Food Orange", "canonical": "#f97316", "tonalRamp": ["#7c2d12", "#9a3412", "#c2410c", "#ea580c", "#f97316", "#fdba74", "#ffedd5", "#fff7ed"] },
+      "category-transportation": { "role": "tertiary", "displayName": "Transit Sky", "canonical": "#0ea5e9", "tonalRamp": ["#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#7dd3fc", "#e0f2fe", "#f0f9ff"] },
+      "category-entertainment": { "role": "tertiary", "displayName": "Entertainment Purple", "canonical": "#a855f7", "tonalRamp": ["#581c87", "#6b21a8", "#7e22ce", "#9333ea", "#a855f7", "#d8b4fe", "#f3e8ff", "#faf5ff"] },
+      "category-shopping": { "role": "tertiary", "displayName": "Shopping Pink", "canonical": "#ec4899", "tonalRamp": ["#831843", "#9d174d", "#be185d", "#db2777", "#ec4899", "#f9a8d4", "#fce7f3", "#fdf2f8"] },
+      "category-bills": { "role": "tertiary", "displayName": "Bills Indigo", "canonical": "#6366f1", "tonalRamp": ["#312e81", "#3730a3", "#4338ca", "#4f46e5", "#6366f1", "#a5b4fc", "#e0e7ff", "#eef2ff"] },
+      "category-other": { "role": "tertiary", "displayName": "Other Slate", "canonical": "#64748b", "tonalRamp": ["#020617", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f8fafc"] }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page titles in the page-header row." },
+      "figure": { "displayName": "Figure", "purpose": "KPI card values; 24px on phones, 26px from sm; always tabular." },
+      "title-dialog": { "displayName": "Dialog Title", "purpose": "Modal titles." },
+      "title": { "displayName": "Title", "purpose": "Card titles and the wordmark." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, row metadata at 14px, inputs." },
+      "body-strong": { "displayName": "Body Strong", "purpose": "Row descriptions, nav items, legend names, toasts; buttons use 600." },
+      "label": { "displayName": "Label", "purpose": "Category badges, segmented options, preset pills, mobile tab labels, row metadata." },
+      "column-header": { "displayName": "Column Header", "purpose": "Sortable table column headers only; uppercase." }
+    },
+    "shadows": [
+      { "name": "control-lift", "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "purpose": "Primary, secondary, and danger buttons, inputs, and the active segmented option." },
+      { "name": "chart-tooltip", "value": "0 4px 12px rgba(15, 23, 42, 0.08)", "purpose": "Trend and donut tooltips, over a 1px hairline border." },
+      { "name": "toast", "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)", "purpose": "Toasts, with a 1px slate-900/10 ring." },
+      { "name": "modal", "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)", "purpose": "Native dialog, over a slate-900/50 backdrop with a 4px blur." },
+      { "name": "fab-add", "value": "0 4px 12px rgba(21, 128, 61, 0.35)", "purpose": "Raised mobile Add button only." }
+    ],
+    "motion": [
+      { "name": "color-transition", "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Color-only hover and active transitions on buttons, rows, nav, pills, and tiles." },
+      { "name": "slide-in", "value": "150ms ease-out; from opacity 0, translateY(8px)", "purpose": "Toast entry." },
+      { "name": "row-actions-reveal", "value": "opacity 150ms cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Table edit and delete actions appear on row hover or focus-within from md up." },
+      { "name": "chart-entry", "value": "Recharts default entry animation", "purpose": "Trend area and donut; disabled under prefers-reduced-motion." },
+      { "name": "skeleton-pulse", "value": "Tailwind animate-pulse", "purpose": "Loading placeholders before localStorage hydrates." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single primary action per view: Add expense, Save changes.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Add expense</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: #15803d; color: #ffffff; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; font-weight: 600; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: #166534; } .ds-btn-primary:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary actions: Cancel, Export CSV, Load sample data.",
+      "html": "<button class=\"ds-btn-secondary\">Export CSV</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: #ffffff; color: #334155; box-shadow: inset 0 0 0 1px #cbd5e1, 0 1px 2px 0 rgb(0 0 0 / 0.05); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-secondary:hover { background: #f8fafc; } .ds-btn-secondary:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Confirm-dialog destructive action.",
+      "html": "<button class=\"ds-btn-danger\">Delete expense</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border: 0; border-radius: 8px; background: #dc2626; color: #ffffff; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; font-weight: 600; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-danger:hover { background: #b91c1c; } .ds-btn-danger:focus-visible { outline: 2px solid #dc2626; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form and filter field with an inset ring that thickens to green on focus; red ring on error.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-desc\">Description</label><input id=\"ds-desc\" class=\"ds-input\" placeholder=\"e.g. Weekly groceries\"><input class=\"ds-input ds-input-error\" value=\"\" aria-invalid=\"true\"><p class=\"ds-field-error\">Enter a description.</p></div>",
+      "css": ".ds-field { display: grid; gap: 6px; width: 280px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-field-label { font-size: 14px; line-height: 20px; font-weight: 500; color: #334155; } .ds-input { display: block; width: 100%; padding: 8px 12px; border: 0; border-radius: 8px; background: #ffffff; color: #0f172a; font: inherit; font-size: 14px; line-height: 20px; box-shadow: inset 0 0 0 1px #cbd5e1, 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-input::placeholder { color: #64748b; } .ds-input:focus { outline: none; box-shadow: inset 0 0 0 2px #15803d; } .ds-input-error { box-shadow: inset 0 0 0 1px #fca5a5; } .ds-input-error:focus { box-shadow: inset 0 0 0 2px #ef4444; } .ds-field-error { margin: 0; font-size: 14px; line-height: 20px; color: #dc2626; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Desktop sidebar: wordmark, full-width Add button, and nav items with a green-wash active state.",
+      "html": "<nav class=\"ds-sidebar\"><div class=\"ds-wordmark\"><span class=\"ds-wordmark-tile\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/></svg></span>Expense Tracker</div><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\" aria-current=\"page\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1\"/></svg>Dashboard</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13\"/></svg>Expenses</a></nav>",
+      "css": ".ds-sidebar { display: flex; flex-direction: column; gap: 2px; width: 240px; padding: 20px 16px; background: #ffffff; border-right: 1px solid #e2e8f0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-wordmark { display: flex; align-items: center; gap: 10px; padding: 0 8px 20px; font-size: 15px; font-weight: 600; color: #0f172a; } .ds-wordmark-tile { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: #15803d; color: #ffffff; } .ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 20px; font-weight: 500; color: #475569; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item svg { color: #64748b; } .ds-nav-item:hover { background: #f1f5f9; color: #0f172a; } .ds-nav-item:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; } .ds-nav-item-active, .ds-nav-item-active:hover { background: #f0fdf4; color: #166534; } .ds-nav-item-active svg { color: #15803d; }"
+    },
+    {
+      "name": "Mobile Tab Bar",
+      "kind": "nav",
+      "refersTo": "fab-add",
+      "description": "Phone navigation: two tabs around a raised green Add button in the thumb zone.",
+      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab ds-tab-active\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1\"/></svg>Dashboard</a><div class=\"ds-tab-center\"><button class=\"ds-fab\" aria-label=\"Add expense\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button></div><a class=\"ds-tab\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13\"/></svg>Expenses</a></nav>",
+      "css": ".ds-tabbar { display: grid; grid-template-columns: repeat(3, 1fr); width: 375px; margin-top: 28px; background: #ffffff; border-top: 1px solid #e2e8f0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 56px; font-size: 12px; font-weight: 500; color: #64748b; text-decoration: none; } .ds-tab-active { color: #166534; } .ds-tab:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; } .ds-tab-center { display: flex; align-items: center; justify-content: center; } .ds-fab { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin-top: -20px; border: 0; border-radius: 9999px; background: #15803d; color: #ffffff; box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35); cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-fab:hover { background: #166534; } .ds-fab:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; }"
+    },
+    {
+      "name": "KPI Card",
+      "kind": "card",
+      "refersTo": "kpi-card",
+      "description": "Bordered white card: label, tabular figure, one-line footer with a color-plus-arrow delta.",
+      "html": "<div class=\"ds-kpi\"><p class=\"ds-kpi-label\">This month</p><p class=\"ds-kpi-value\">$979.75</p><p class=\"ds-kpi-footer\"><span class=\"ds-delta-up\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg>3.1%</span> vs last month</p></div>",
+      "css": ".ds-kpi { width: 240px; padding: 16px 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-kpi-label { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; color: #475569; } .ds-kpi-value { margin: 6px 0 0; font-size: 26px; line-height: 1.25; font-weight: 600; letter-spacing: -0.025em; color: #0f172a; font-variant-numeric: tabular-nums; } .ds-kpi-footer { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #475569; white-space: nowrap; } .ds-delta-up { display: inline-flex; align-items: center; font-weight: 500; color: #b91c1c; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Category Badge",
+      "kind": "chip",
+      "refersTo": "category-badge",
+      "description": "Per-category chip: 50 tint, 700 text, 600/20 inset ring. Data hues only.",
+      "html": "<span class=\"ds-badge ds-badge-food\">Food</span> <span class=\"ds-badge ds-badge-transport\">Transportation</span> <span class=\"ds-badge ds-badge-bills\">Bills</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 12px; line-height: 16px; font-weight: 500; } .ds-badge-food { background: #fff7ed; color: #c2410c; box-shadow: inset 0 0 0 1px rgb(234 88 12 / 0.2); } .ds-badge-transport { background: #f0f9ff; color: #0369a1; box-shadow: inset 0 0 0 1px rgb(2 132 199 / 0.2); } .ds-badge-bills { background: #eef2ff; color: #4338ca; box-shadow: inset 0 0 0 1px rgb(79 70 229 / 0.2); }"
+    },
+    {
+      "name": "Date Preset Pills and Segmented Control",
+      "kind": "chip",
+      "refersTo": "preset-pill",
+      "description": "Filter presets (green when active) and the card-header period toggle (white raised option on a slate track).",
+      "html": "<div class=\"ds-chip-row\"><button class=\"ds-pill ds-pill-active\" aria-pressed=\"true\">This month</button><button class=\"ds-pill\" aria-pressed=\"false\">Last month</button><button class=\"ds-pill\" aria-pressed=\"false\">Last 3 months</button></div><div class=\"ds-seg\" role=\"group\"><button class=\"ds-seg-opt ds-seg-opt-active\" aria-pressed=\"true\">This month</button><button class=\"ds-seg-opt\" aria-pressed=\"false\">All time</button></div>",
+      "css": ".ds-chip-row { display: flex; gap: 8px; margin-bottom: 16px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-pill { padding: 4px 12px; border: 0; border-radius: 9999px; background: #ffffff; color: #475569; box-shadow: inset 0 0 0 1px #cbd5e1; font: inherit; font-size: 12px; line-height: 16px; font-weight: 500; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-pill:hover { background: #f8fafc; } .ds-pill:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; } .ds-pill-active, .ds-pill-active:hover { background: #15803d; color: #ffffff; box-shadow: inset 0 0 0 1px #15803d; } .ds-seg { display: inline-flex; padding: 2px; border-radius: 8px; background: #f1f5f9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-seg-opt { padding: 4px 10px; border: 0; border-radius: 6px; background: transparent; color: #475569; font: inherit; font-size: 12px; line-height: 16px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-seg-opt:hover { color: #0f172a; } .ds-seg-opt:focus-visible { outline: 2px solid #15803d; outline-offset: 2px; } .ds-seg-opt-active { background: #ffffff; color: #0f172a; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }"
+    },
+    {
+      "name": "Transaction Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Bordered card with a 20px header and edge-to-edge rows: description, badge and date, tabular amount, chevron.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><h2 class=\"ds-card-title\">Recent transactions</h2><a class=\"ds-link\" href=\"#\">View all</a></div><ul class=\"ds-rows\"><li><button class=\"ds-row\"><span class=\"ds-row-main\"><span class=\"ds-row-desc\">Lunch with coworkers</span><span class=\"ds-row-meta\"><span class=\"ds-dot\"></span>Food · Oct 26, 2026</span></span><span class=\"ds-row-amt\">$27.23</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#64748b\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button></li><li><button class=\"ds-row\"><span class=\"ds-row-main\"><span class=\"ds-row-desc\">Electricity bill</span><span class=\"ds-row-meta\"><span class=\"ds-dot ds-dot-bills\"></span>Bills · Oct 26, 2026</span></span><span class=\"ds-row-amt\">$99.20</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#64748b\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button></li></ul></div>",
+      "css": ".ds-card { width: 420px; overflow: hidden; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px 20px 12px; } .ds-card-title { margin: 0; font-size: 15px; line-height: 24px; font-weight: 600; color: #0f172a; } .ds-link { font-size: 14px; font-weight: 500; color: #15803d; text-decoration: none; } .ds-link:hover { color: #166534; } .ds-rows { margin: 0; padding: 0; list-style: none; border-top: 1px solid #f1f5f9; } .ds-rows li + li { border-top: 1px solid #f1f5f9; } .ds-row { display: flex; align-items: center; gap: 16px; width: 100%; padding: 12px 20px; border: 0; background: transparent; text-align: left; font: inherit; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-row:hover { background: #f8fafc; } .ds-row:focus-visible { outline: 2px solid #15803d; outline-offset: -2px; } .ds-row-main { display: grid; gap: 2px; flex: 1; min-width: 0; } .ds-row-desc { font-size: 14px; line-height: 20px; font-weight: 500; color: #0f172a; } .ds-row-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #475569; } .ds-dot { width: 8px; height: 8px; border-radius: 9999px; background: #f97316; } .ds-dot-bills { background: #6366f1; } .ds-row-amt { font-size: 14px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Ledger",
+    "overview": "The system is the personal-finance category standard, built to a high craft bar and played straight. A cool slate ground holds white, hairline-bordered cards. The numbers carry the page: large tabular figures, a clear title row, and charts that use the category palette and nothing else. One green does all the interactive work: the primary action, the active nav item, focus, selection, and the trend series. Everything else is neutral slate.\n\nDensity is moderate and even. Cards sit on a 16px gutter, pad 20px inside, and never float on shadows. Hierarchy comes from type size and weight in a single family (Inter), not from color blocks or ornament. The page is calm because so little competes with the figures. The system rejects the indigo SaaS-template finish: weak hierarchy, decorative icon chips, and loose spacing.\n\nThe shell is a fixed 240px white sidebar on desktop. On phones it becomes a slim top bar plus a bottom tab bar, with a raised green Add button in the thumb zone. Adding an expense is one click from anywhere.",
+    "keyCharacteristics": [
+      "Slate-50 ground, white cards, 1px slate-200 borders, no resting shadows.",
+      "One reserved green for action, active state, focus, selection, and the spending-down delta.",
+      "Category hues appear only as data: chart series, legend dots, and category badges.",
+      "Inter at a real scale, with tabular figures on every amount and count.",
+      "12px container corners and 8px control corners."
+    ],
+    "rules": [
+      { "name": "The Reserved Green Rule", "body": "Green means \"act here,\" \"you are here,\" or \"spending went down.\" No category may be green. Bills is indigo for exactly this reason.", "section": "colors" },
+      { "name": "The Data-Only Hue Rule", "body": "Category hues appear only in charts, legend dots, and category badges or tiles. Never use one on chrome, buttons, or headings.", "section": "colors" },
+      { "name": "The 600-For-Text Rule", "body": "Green text and green-filled controls with text use `ledger-green` or darker. `ledger-green-data` is a fill for chart marks only.", "section": "colors" },
+      { "name": "The Delta Pair Rule", "body": "A delta always pairs color with direction: red-700 with an up-right arrow for an increase, `ledger-green-deep` with a down-right arrow for a decrease. Color is never the only signal.", "section": "colors" },
+      { "name": "The Tabular Figures Rule", "body": "Every currency amount, percentage, and count uses `tabular-nums`. That includes the KPIs, table and row amounts, legend values, tooltips, the totals bar, the amount input, and the character counter.", "section": "typography" },
+      { "name": "The One Family Rule", "body": "Inter carries every role. Hierarchy comes from size and weight, never from a second face.", "section": "typography" },
+      { "name": "The Border-Not-Shadow Rule", "body": "Resting containers (cards, banners, the sidebar, and bars) use a 1px border and no shadow. A shadow means the layer floats.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** put every new surface on the slate ground in white cards with a 1px hairline border and 12px corners.",
+      "**Do** use Ledger Green for the single primary action per view, the active nav state, selection, and focus. Hover it to Ledger Green Deep.",
+      "**Do** set every amount, percent, and count in tabular figures.",
+      "**Do** pair any delta color with an arrow (red-700 for up, deep green for down).",
+      "**Do** draw new chart series from the category hues in `CATEGORY_META`, and use Ledger Green Data for a single-series total.",
+      "**Do** keep controls at 8px corners with a 1px inset slate ring and a 2px green focus ring.",
+      "**Do** gate any new animation on `prefers-reduced-motion`, as the charts do."
+    ],
+    "donts": [
+      "**Don't** add shadows to resting cards or banners. Shadows are for tooltips, toasts, the modal, and the FAB.",
+      "**Don't** assign green to a category or use it for decoration. It is reserved for action, active state, and the spending-down delta.",
+      "**Don't** use a category hue on buttons, headings, or nav.",
+      "**Don't** use `ledger-green-data` for text or a text-bearing fill. It fails contrast.",
+      "**Don't** introduce indigo or violet as a UI accent. Indigo exists only as the Bills data hue.",
+      "**Don't** add a second typeface or a display face. Inter carries every role.",
+      "**Don't** place small uppercase eyebrows or kickers above headings. Uppercase is used only for table column headers."
+    ]
+  }
+}

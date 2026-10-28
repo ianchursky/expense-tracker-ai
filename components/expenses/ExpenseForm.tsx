@@ -1,6 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
+import { Trash2 } from "lucide-react";
 import { useId, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { CATEGORY_META } from "@/lib/categories";
@@ -18,6 +19,8 @@ interface ExpenseFormProps {
   initial?: Expense;
   onSubmit: (input: ExpenseInput) => void;
   onCancel: () => void;
+  /** Shown only when editing. */
+  onDelete?: () => void;
 }
 
 function initialValues(expense?: Expense): ExpenseFormValues {
@@ -32,13 +35,13 @@ function initialValues(expense?: Expense): ExpenseFormValues {
 }
 
 const inputClass =
-  "block w-full rounded-lg border-0 py-2 text-slate-900 shadow-sm ring-1 ring-inset placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-inset sm:text-sm";
+  "block w-full rounded-lg border-0 py-2 text-slate-900 shadow-sm ring-1 ring-inset placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-inset sm:text-sm";
 
 function fieldRing(error?: string) {
   return error ? "ring-red-300 focus:ring-red-500" : "ring-slate-300 focus:ring-brand-600";
 }
 
-export function ExpenseForm({ initial, onSubmit, onCancel }: ExpenseFormProps) {
+export function ExpenseForm({ initial, onSubmit, onCancel, onDelete }: ExpenseFormProps) {
   const id = useId();
   const [values, setValues] = useState<ExpenseFormValues>(() => initialValues(initial));
   const [touched, setTouched] = useState<Partial<Record<keyof ExpenseFormValues, boolean>>>({});
@@ -130,10 +133,15 @@ export function ExpenseForm({ initial, onSubmit, onCancel }: ExpenseFormProps) {
       </div>
 
       <fieldset>
-        <legend className="block text-sm font-medium text-slate-700">Category</legend>
+        <legend id={`${id}-category-legend`} className="block text-sm font-medium text-slate-700">
+          Category
+        </legend>
         <div
-          className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3"
+          role="radiogroup"
+          aria-labelledby={`${id}-category-legend`}
+          aria-invalid={!!categoryError}
           aria-describedby={categoryError ? `${id}-category-error` : undefined}
+          className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3"
         >
           {CATEGORIES.map((category, index) => {
             const { icon: Icon, iconClass } = CATEGORY_META[category];
@@ -145,15 +153,19 @@ export function ExpenseForm({ initial, onSubmit, onCancel }: ExpenseFormProps) {
                   "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600",
                   selected
                     ? "border-brand-600 bg-brand-50 text-brand-700"
-                    : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50",
+                    : categoryError
+                      ? "border-red-300 text-slate-700 hover:bg-slate-50"
+                      : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50",
                 )}
               >
+                {/* Also referenced per option so the error is read when any option takes focus. */}
                 <input
                   id={index === 0 ? `${id}-category` : undefined}
                   type="radio"
                   name={`${id}-category`}
                   value={category}
                   checked={selected}
+                  aria-describedby={categoryError ? `${id}-category-error` : undefined}
                   onChange={() => {
                     set("category", category);
                     touch("category");
@@ -183,7 +195,7 @@ export function ExpenseForm({ initial, onSubmit, onCancel }: ExpenseFormProps) {
           <span
             className={clsx(
               "text-xs tabular-nums",
-              values.description.trim().length > MAX_DESCRIPTION_LENGTH ? "text-red-600" : "text-slate-400",
+              values.description.trim().length > MAX_DESCRIPTION_LENGTH ? "text-red-600" : "text-slate-500",
             )}
           >
             {values.description.trim().length}/{MAX_DESCRIPTION_LENGTH}
@@ -207,8 +219,14 @@ export function ExpenseForm({ initial, onSubmit, onCancel }: ExpenseFormProps) {
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
-        <Button variant="secondary" onClick={onCancel}>
+      <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:items-center">
+        {onDelete && (
+          <Button variant="ghost" onClick={onDelete} className="!text-red-700 hover:!bg-red-50 hover:!text-red-800 sm:mr-auto">
+            <Trash2 className="h-4 w-4" aria-hidden />
+            Delete
+          </Button>
+        )}
+        <Button variant="secondary" onClick={onCancel} className="sm:ml-auto">
           Cancel
         </Button>
         <Button type="submit">{initial ? "Save changes" : "Add expense"}</Button>

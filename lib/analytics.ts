@@ -99,7 +99,14 @@ export interface DashboardSummary {
   count: number;
   thisMonth: number;
   lastMonth: number;
-  /** Percent change of this month vs. last month; null when last month had no spending. */
+  /** Last month's spending over the same days elapsed so far this month (1st through today's day, clamped). */
+  lastMonthToDate: number;
+  /** Inclusive `YYYY-MM-DD` bounds of that comparison window, for labeling it. */
+  comparisonRange: { startDate: string; endDate: string };
+  /**
+   * Percent change of this month so far vs. the same days of last month, so a partial month is never
+   * compared with a full one. Null when that window had no spending.
+   */
   monthChange: number | null;
   /** Average spending per day so far this month. */
   dailyAverageThisMonth: number;
@@ -113,14 +120,25 @@ export function getDashboardSummary(expenses: Expense[], now = new Date()): Dash
 
   const thisMonthItems = expenses.filter((e) => monthKey(e.date) === thisMonthKey);
   const thisMonth = sumAmounts(thisMonthItems);
-  const lastMonth = sumAmounts(expenses.filter((e) => monthKey(e.date) === lastMonthKey));
+  const lastMonthItems = expenses.filter((e) => monthKey(e.date) === lastMonthKey);
+  const lastMonth = sumAmounts(lastMonthItems);
+
+  // Day 31 compares against all of a 30-day month, not a rollover into this one.
+  const lastMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+  const comparisonRange = {
+    startDate: toISODate(new Date(now.getFullYear(), now.getMonth() - 1, 1)),
+    endDate: toISODate(new Date(now.getFullYear(), now.getMonth() - 1, Math.min(now.getDate(), lastMonthDays))),
+  };
+  const lastMonthToDate = sumAmounts(lastMonthItems.filter((e) => e.date <= comparisonRange.endDate));
 
   return {
     total: sumAmounts(expenses),
     count: expenses.length,
     thisMonth,
     lastMonth,
-    monthChange: lastMonth > 0 ? ((thisMonth - lastMonth) / lastMonth) * 100 : null,
+    lastMonthToDate,
+    comparisonRange,
+    monthChange: lastMonthToDate > 0 ? ((thisMonth - lastMonthToDate) / lastMonthToDate) * 100 : null,
     dailyAverageThisMonth: roundToCents(thisMonth / now.getDate()),
     topCategory: totalsByCategory(thisMonthItems)[0] ?? totalsByCategory(expenses)[0] ?? null,
     thisMonthCount: thisMonthItems.length,

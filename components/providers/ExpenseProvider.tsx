@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { BACKUP_KEY, loadBackup, parseBackup, saveBackup, type BackupRecord } from "@/lib/backup";
 import { createId, loadExpenses, parseStoredExpenses, saveExpenses, STORAGE_KEY } from "@/lib/storage";
+import { generateSampleExpenses } from "@/lib/sampleData";
 import type { Expense, ExpenseInput } from "@/lib/types";
 import { useToast } from "./ToastProvider";
 
@@ -11,18 +13,36 @@ interface ExpenseContextValue {
   isLoaded: boolean;
   storageError: string | null;
   addExpense: (input: ExpenseInput) => Expense;
-  addExpenses: (inputs: ExpenseInput[]) => void;
+  /** Adds generated demo expenses; returns how many were added. */
+  loadSampleData: () => number;
+  removeSampleData: () => number;
+  hasSampleData: boolean;
   updateExpense: (id: string, input: ExpenseInput) => void;
   deleteExpense: (id: string) => Expense | undefined;
-  restoreExpense: (expense: Expense) => void;
-  clearAll: () => void;
+  /** Puts previously removed expenses back (Undo). Ids already present are ignored. */
+  restoreExpenses: (expenses: Expense[]) => void;
+  /** Adds imported expenses. Returns them, or null when they could not be saved (nothing is changed then). */
+  importExpenses: (inputs: ExpenseInput[]) => Expense[] | null;
+  removeExpenses: (ids: string[]) => void;
+  /** Deletes everything and returns what was removed, for Undo. */
+  clearAll: () => Expense[];
+  /** Last time every expense was exported to CSV, or null if never. */
+  lastBackup: BackupRecord | null;
+  /** Expenses added or edited since that backup (deletions aren't tracked). */
+  changesSinceBackup: number;
+  /** Record that all current expenses were just exported. */
+  markBackedUp: () => void;
 }
 
 const ExpenseContext = createContext<ExpenseContextValue | null>(null);
 
-function buildExpense(input: ExpenseInput): Expense {
+// Sample expenses are marked by id prefix so they can be labeled and removed without changing the stored shape.
+const SAMPLE_PREFIX = "sample-";
+const isSample = (e: Expense) => e.id.startsWith(SAMPLE_PREFIX);
+
+function buildExpense(input: ExpenseInput, idPrefix = ""): Expense {
   const now = new Date().toISOString();
-  return { ...input, id: createId(), createdAt: now, updatedAt: now };
+  return { ...input, id: idPrefix + createId(), createdAt: now, updatedAt: now };
 }
 
 export function ExpenseProvider({ children }: { children: ReactNode }) {
@@ -30,6 +50,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [lastBackup, setLastBackup] = useState<BackupRecord | null>(null);
   // Mirror of state so mutations can compute the next list synchronously and persist it once.
   const expensesRef = useRef<Expense[]>([]);
   // StrictMode runs effects twice in development; only report load problems once.
@@ -44,6 +65,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     const result = loadExpenses();
     replace(result.expenses);
     setStorageError(result.error ?? null);
+    setLastBackup(loadBackup());
     setIsLoaded(true);
     if (!loadReported.current) {
       loadReported.current = true;
@@ -53,19 +75,21 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
     // Keep multiple open tabs in sync.
     const onStorage = (event: StorageEvent) => {
-      if (event.key !== STORAGE_KEY) return;
-      replace(parseStoredExpenses(event.newValue).expenses);
+      if (event.key === STORAGE_KEY) replace(parseStoredExpenses(event.newValue).expenses);
+      else if (event.key === BACKUP_KEY) setLastBackup(parseBackup(event.newValue));
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, [replace, toast]);
 
+  /** Updates state and persists; returns the storage error message, if any. */
   const commit = useCallback(
     (next: Expense[]) => {
       replace(next);
       const error = saveExpenses(next);
       setStorageError(error);
       if (error) toast(error, "error");
+      return error;
     },
     [replace, toast],
   );
@@ -79,10 +103,20 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
-  const addExpenses = useCallback(
-    (inputs: ExpenseInput[]) => commit([...inputs.map(buildExpense), ...expensesRef.current]),
-    [commit],
-  );
+  const loadSampleData = useCallback(() => {
+    const sample = generateSampleExpenses().map((input) => buildExpense(input, SAMPLE_PREFIX));
+    commit([...sample, ...expensesRef.current]);
+    return sample.length;
+  }, [commit]);
+
+  const removeSampleData = useCallback(() => {
+    const kept = expensesRef.current.filter((e) => !isSample(e));
+    const removed = expensesRef.current.length - kept.length;
+    commit(kept);
+    return removed;
+  }, [commit]);
+
+  const hasSampleData = useMemo(() => expenses.some(isSample), [expenses]);
 
   const updateExpense = useCallback(
     (id: string, input: ExpenseInput) =>
@@ -101,15 +135,54 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
-  const restoreExpense = useCallback(
-    (expense: Expense) => {
-      if (expensesRef.current.some((e) => e.id === expense.id)) return;
-      commit([expense, ...expensesRef.current]);
+  const restoreExpenses = useCallback(
+    (restored: Expense[]) => {
+      const present = new Set(expensesRef.current.map((e) => e.id));
+      const missing = restored.filter((e) => !present.has(e.id));
+      if (missing.length) commit([...missing, ...expensesRef.current]);
     },
     [commit],
   );
 
-  const clearAll = useCallback(() => commit([]), [commit]);
+  const importExpenses = useCallback(
+    (inputs: ExpenseInput[]) => {
+      const previous = expensesRef.current;
+      const imported = inputs.map((input) => buildExpense(input));
+      if (commit([...imported, ...previous])) {
+        // Storage rejected it (usually quota): roll back so the screen matches what will survive a reload.
+        replace(previous);
+        setStorageError(null);
+        return null;
+      }
+      return imported;
+    },
+    [commit, replace],
+  );
+
+  const removeExpenses = useCallback(
+    (ids: string[]) => {
+      const drop = new Set(ids);
+      commit(expensesRef.current.filter((e) => !drop.has(e.id)));
+    },
+    [commit],
+  );
+
+  const clearAll = useCallback(() => {
+    const removed = expensesRef.current;
+    commit([]);
+    return removed;
+  }, [commit]);
+
+  const markBackedUp = useCallback(() => {
+    const record = { at: new Date().toISOString(), count: expensesRef.current.length };
+    saveBackup(record);
+    setLastBackup(record);
+  }, []);
+
+  const changesSinceBackup = useMemo(
+    () => (lastBackup ? expenses.filter((e) => e.updatedAt > lastBackup.at).length : expenses.length),
+    [expenses, lastBackup],
+  );
 
   const value = useMemo(
     () => ({
@@ -117,13 +190,37 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       isLoaded,
       storageError,
       addExpense,
-      addExpenses,
+      loadSampleData,
+      removeSampleData,
+      hasSampleData,
       updateExpense,
       deleteExpense,
-      restoreExpense,
+      restoreExpenses,
+      importExpenses,
+      removeExpenses,
       clearAll,
+      lastBackup,
+      changesSinceBackup,
+      markBackedUp,
     }),
-    [expenses, isLoaded, storageError, addExpense, addExpenses, updateExpense, deleteExpense, restoreExpense, clearAll],
+    [
+      expenses,
+      isLoaded,
+      storageError,
+      addExpense,
+      loadSampleData,
+      removeSampleData,
+      hasSampleData,
+      updateExpense,
+      deleteExpense,
+      restoreExpenses,
+      importExpenses,
+      removeExpenses,
+      clearAll,
+      lastBackup,
+      changesSinceBackup,
+      markBackedUp,
+    ],
   );
 
   return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;

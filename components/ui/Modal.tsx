@@ -15,6 +15,7 @@ interface ModalProps {
 export function Modal({ open, onClose, title, description, children }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -31,12 +32,13 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
     <dialog
       ref={ref}
       aria-labelledby={titleId}
+      aria-describedby={description ? descriptionId : undefined}
       onClose={onClose}
       // Clicks on the dialog element itself (not its content) are backdrop clicks.
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
+      className="w-[calc(100%-2rem)] max-w-lg rounded-xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
     >
       {open && (
         <div className="p-5 sm:p-6">
@@ -45,12 +47,16 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
               <h2 id={titleId} className="text-lg font-semibold text-slate-900">
                 {title}
               </h2>
-              {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+              {description && (
+                <p id={descriptionId} className="mt-1 text-sm text-slate-600">
+                  {description}
+                </p>
+              )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="-mr-1 -mt-1 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              className="-mr-1 -mt-1 rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-600"
               aria-label="Close dialog"
             >
               <X className="h-5 w-5" />
