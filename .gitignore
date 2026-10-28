@@ -21,3 +21,8 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# impeccable: machine-local state and review captures
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/review/

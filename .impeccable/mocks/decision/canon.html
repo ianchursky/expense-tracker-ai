@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Category standard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;font-family:Inter,sans-serif;color:#0f172a;background:#f8fafc;font-variant-numeric:tabular-nums}
+body{display:grid;grid-template-columns:240px 1fr}
+.side{background:#fff;border-right:1px solid #e2e8f0;padding:24px 16px}
+.logo{font-weight:700;font-size:17px;margin:0 8px 28px}
+.side a{display:block;padding:9px 12px;border-radius:8px;color:#475569;font-size:14px;font-weight:500;text-decoration:none;margin-bottom:2px}
+.side a.on{background:#f0fdf4;color:#15803d}
+.main{padding:32px 40px}
+.top{display:flex;align-items:center;margin-bottom:24px}.top h1{font-size:24px;font-weight:700}
+.btn{margin-left:auto;background:#15803d;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600;font-size:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px}
+.card p{font-size:13px;color:#64748b}.card h2{font-size:26px;font-weight:700;margin:8px 0 4px}.up{font-size:13px;color:#dc2626}.dn{font-size:13px;color:#15803d}
+.row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:16px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:14px}
+svg{display:block;width:100%;height:230px}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:10px 0;border-top:1px solid #f1f5f9}td.r{text-align:right;font-weight:600}
+.pill{font-size:12px;background:#f1f5f9;color:#475569;border-radius:999px;padding:2px 8px}
+</style></head><body>
+<aside class="side"><div class="logo">Expense Tracker</div><a class="on" href="#">Dashboard</a><a href="#">Expenses</a><a href="#">Reports</a></aside>
+<main class="main">
+<div class="top"><h1>Dashboard</h1><button class="btn">+ Add expense</button></div>
+<div class="kpis">
+<div class="card"><p>Total spending</p><h2>$5,729.23</h2><span class="dn">128 expenses</span></div>
+<div class="card"><p>This month</p><h2>$992.09</h2><span class="up">▲ 4.4% vs last month</span></div>
+<div class="card"><p>Daily average</p><h2>$36.74</h2><span class="dn">27 days</span></div>
+<div class="card"><p>Top category</p><h2>Food</h2><span class="dn">49% of this month</span></div></div>
+<div class="row">
+<div class="card"><h3>Spending trend</h3>
+<svg viewBox="0 0 600 230" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#16a34a" stop-opacity=".25"/><stop offset="1" stop-color="#16a34a" stop-opacity="0"/></linearGradient></defs>
+<path d="M0 80 L120 110 L240 50 L360 95 L480 85 L600 62 L600 230 L0 230Z" fill="url(#g)"/><path d="M0 80 L120 110 L240 50 L360 95 L480 85 L600 62" fill="none" stroke="#16a34a" stroke-width="3"/></svg></div>
+<div class="card"><h3>Recent transactions</h3><table>
+<tr><td>Gas<br><span class="pill">Transportation</span></td><td class="r">$64.53</td></tr>
+<tr><td>Lunch with coworkers<br><span class="pill">Food</span></td><td class="r">$27.23</td></tr>
+<tr><td>Electricity bill<br><span class="pill">Bills</span></td><td class="r">$99.20</td></tr>
+<tr><td>Movie tickets<br><span class="pill">Entertainment</span></td><td class="r">$23.07</td></tr></table></div></div>
+</main></body></html>
