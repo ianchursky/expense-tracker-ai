@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, Receipt, SearchX, Share2, Sparkles, Trash2 } from "lucide-react";
 import { ChevronDown, Database, Download, FileDown, FileUp, Plus, Receipt, SearchX, Sparkles, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
@@ -12,6 +13,7 @@ import { Menu } from "@/components/ui/Menu";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ExportSheet } from "@/components/export/ExportSheet";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
+import { ExportComposer } from "@/components/cloud/ExportComposer";
 import type { ExportScope } from "@/lib/export";
 import { formatCurrency } from "@/lib/format";
 import { generateSampleExpenses } from "@/lib/sampleData";
@@ -76,6 +78,19 @@ export function ExpensesView() {
     setVisibleCount(PAGE_SIZE);
   };
 
+  const [composerOpen, setComposerOpen] = useState(false);
+
+  const handleClearAll = () =>
+    confirm({
+      title: "Delete all expenses?",
+      message: `This permanently removes all ${expenses.length} expenses from this browser. Export a Full Backup first if you want to keep a copy.`,
+      confirmLabel: "Delete all",
+      onConfirm: () => {
+        clearAll();
+        toast("All expenses deleted.");
+      },
+    });
+
   const [exportOpen, setExportOpen] = useState(false);
   // The export starts from the list's date and category filters; search text is a lookup aid, not a scope.
   const exportScope: ExportScope = {
@@ -112,6 +127,8 @@ export function ExpensesView() {
               <Button variant="ghost" onClick={handleClearAll}>
                 <Trash2 className="h-4 w-4" aria-hidden /> Delete all
               </Button>
+              <Button variant="secondary" onClick={() => setComposerOpen(true)} aria-haspopup="dialog">
+                <Share2 className="h-4 w-4" aria-hidden /> Export &amp; share
               <Button variant="secondary" onClick={() => setExportOpen(true)} aria-haspopup="dialog">
                 <Download className="h-4 w-4" aria-hidden /> Export…
               <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
@@ -200,6 +217,7 @@ export function ExpensesView() {
         )}
       </Card>
 
+      <ExportComposer open={composerOpen} onClose={() => setComposerOpen(false)} preset={{}} />
       <ExportSheet open={exportOpen} onClose={() => setExportOpen(false)} initialScope={exportScope} />
     </>
   );

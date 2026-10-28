@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { CloudProvider } from "@/components/cloud/CloudProvider";
+import { JobTray } from "@/components/cloud/JobTray";
 import { Navbar } from "@/components/layout/Navbar";
 import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
 import { StorageStatus } from "@/components/layout/StorageStatus";
@@ -31,6 +33,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <ExpenseProvider>
             <ExpenseDialogProvider>
+              <CloudProvider>
+                <Navbar />
+                <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+                  <StorageWarning />
+                  {children}
+                </main>
+                <JobTray />
+              </CloudProvider>
               <Navbar />
               <div className="lg:pl-60">
                 <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:py-8">

@@ -1,9 +1,10 @@
 "use client";
 
 import { clsx } from "clsx";
-import { LayoutDashboard, List, Plus, Wallet } from "lucide-react";
+import { LayoutDashboard, List, Plus, Share2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SyncIndicator } from "@/components/cloud/SyncIndicator";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { Button } from "@/components/ui/Button";
 import { StorageStatus } from "./StorageStatus";
@@ -11,6 +12,7 @@ import { StorageStatus } from "./StorageStatus";
 const LINKS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/expenses", label: "Expenses", icon: List },
+  { href: "/exports", label: "Exports", icon: Share2 },
 ];
 
 function useActive() {
@@ -57,6 +59,8 @@ export function Navbar() {
                   active ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                 )}
               >
+                <Icon className="h-4 w-4" aria-hidden />
+                <span className="sr-only sm:not-sr-only">{label}</span>
                 <Icon className={clsx("h-4 w-4", active ? "text-brand-600" : "text-slate-500")} aria-hidden />
                 {label}
               </Link>
@@ -68,6 +72,15 @@ export function Navbar() {
         </div>
       </aside>
 
+        <div className="ml-auto">
+          <SyncIndicator variant="nav" />
+        </div>
+        <Button onClick={openAdd} aria-label="Add expense">
+          <Plus className="h-4 w-4" aria-hidden />
+          <span className="hidden sm:inline">Add expense</span>
+        </Button>
+      </div>
+    </header>
       <header className="sticky top-0 z-40 flex h-14 items-center border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:hidden">
         <Wordmark />
       </header>
