@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/Button";
 import { Card, Skeleton } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ExportSheet } from "@/components/export/ExportSheet";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
-import { downloadCSV, expensesToCSV } from "@/lib/csv";
-import { formatCurrency, todayISO } from "@/lib/format";
+import type { ExportScope } from "@/lib/export";
+import { formatCurrency } from "@/lib/format";
 import { generateSampleExpenses } from "@/lib/sampleData";
-import type { ExpenseFilters, SortState } from "@/lib/types";
+import { CATEGORIES, type ExpenseFilters, type SortState } from "@/lib/types";
 import { ExpenseFiltersBar } from "./ExpenseFiltersBar";
 import { ExpenseList } from "./ExpenseList";
 
@@ -48,13 +49,12 @@ export function ExpensesView() {
     setVisibleCount(PAGE_SIZE);
   };
 
-  const handleExport = () => {
-    try {
-      downloadCSV(`expenses-${todayISO()}.csv`, expensesToCSV(visible));
-      toast(`Exported ${visible.length} expense${visible.length === 1 ? "" : "s"} to CSV.`);
-    } catch {
-      toast("Export failed. Please try again.", "error");
-    }
+  const [exportOpen, setExportOpen] = useState(false);
+  // The export starts from the list's date and category filters; search text is a lookup aid, not a scope.
+  const exportScope: ExportScope = {
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    categories: filters.category === "All" ? [...CATEGORIES] : [filters.category],
   };
 
   const handleClearAll = () =>
@@ -87,8 +87,8 @@ export function ExpensesView() {
               <Button variant="ghost" onClick={handleClearAll}>
                 <Trash2 className="h-4 w-4" aria-hidden /> Delete all
               </Button>
-              <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
-                <Download className="h-4 w-4" aria-hidden /> Export CSV
+              <Button variant="secondary" onClick={() => setExportOpen(true)} aria-haspopup="dialog">
+                <Download className="h-4 w-4" aria-hidden /> Export…
               </Button>
             </>
           )
@@ -152,6 +152,8 @@ export function ExpensesView() {
           </>
         )}
       </Card>
+
+      <ExportSheet open={exportOpen} onClose={() => setExportOpen(false)} initialScope={exportScope} />
     </>
   );
 }

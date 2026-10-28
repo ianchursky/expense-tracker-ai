@@ -35,3 +35,9 @@ Next.js 14 App Router + TypeScript + Tailwind; client-only data stored in `local
 - The storage key is versioned (`expense-tracker:expenses:v1`). If you change the `Expense` shape, bump the key or add a migration in `storage.ts`, because `isExpense()` silently drops records that don't match.
 - Modals use the native `<dialog>` element (`components/ui/Modal.tsx`), which renders in the browser top layer above toasts.
 - Charts use Recharts (`components/dashboard/*Chart*`, `CategoryBreakdown`). They must stay in `"use client"` components.
+
+**Export (`lib/export/`, `components/export/`)**
+- Formats are pluggable: each implements `ExportFormat` (`id`, `label`, `extension`, `mimeType`, `build(context, settings) → Promise<Blob>`) and is registered in `EXPORT_FORMATS` in `lib/export/index.ts`. Adding a format means a new module in `lib/export/formats/`, a settings entry in `FormatSettings`, a default in `preferences.ts`, and its controls in `ExportOptionsPanel`.
+- `runExport(expenses, options)` is the only entry point. It selects records (`selectForExport`: inclusive date range, explicit category list, where an empty list exports nothing), builds the blob, and names the file (`withExtension`). `lib/export` has no React imports, so it can be tested in Node; the PDF format needs `NODE_PATH` pointing at `node_modules` because it dynamic-imports jsPDF.
+- The PDF format dynamic-imports `jspdf` and `jspdf-autotable`; keep it that way so they stay out of the page bundle. jsPDF's built-in fonts only cover WinAnsi, so text goes through `toPdfText()`.
+- The UI is a side `Sheet` (`components/ui/Sheet.tsx`, native `<dialog>`) opened from the Expenses page with the list's date and category filters as the starting scope. `useExportDraft` holds the draft; it is mounted only while the sheet is open so each opening starts fresh. Format, sort and per-format settings persist in `expense-tracker:export-preferences:v1`; scope and filename never do.
