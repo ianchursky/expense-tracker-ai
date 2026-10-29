@@ -35,23 +35,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ExpenseDialogProvider>
               <CloudProvider>
                 <Navbar />
-                <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-                  <StorageWarning />
-                  {children}
-                </main>
+                <div className="lg:pl-60">
+                  <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:py-8">
+                    <StorageWarning />
+                    <SampleDataNotice />
+                    {children}
+                    <div className="mt-8 lg:hidden">
+                      <StorageStatus variant="inline" />
+                    </div>
+                  </main>
+                </div>
                 <JobTray />
               </CloudProvider>
-              <Navbar />
-              <div className="lg:pl-60">
-                <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:py-8">
-                  <StorageWarning />
-                  <SampleDataNotice />
-                  {children}
-                  <div className="mt-8 lg:hidden">
-                    <StorageStatus variant="inline" />
-                  </div>
-                </main>
-              </div>
             </ExpenseDialogProvider>
           </ExpenseProvider>
         </ToastProvider>

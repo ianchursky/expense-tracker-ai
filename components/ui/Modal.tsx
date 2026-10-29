@@ -42,10 +42,9 @@ export function Modal({ open, onClose, title, description, size = "md", children
         if (e.target === ref.current) onClose();
       }}
       className={clsx(
-        "w-[calc(100%-2rem)] rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
+        "w-[calc(100%-2rem)] rounded-xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
         size === "lg" ? "max-w-2xl" : "max-w-lg",
       )}
-      className="w-[calc(100%-2rem)] max-w-lg rounded-xl bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm"
     >
       {open && (
         <div className="p-5 sm:p-6">

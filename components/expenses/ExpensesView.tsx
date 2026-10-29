@@ -1,7 +1,6 @@
 "use client";
 
-import { Plus, Receipt, SearchX, Share2, Sparkles, Trash2 } from "lucide-react";
-import { ChevronDown, Database, Download, FileDown, FileUp, Plus, Receipt, SearchX, Sparkles, Trash2 } from "lucide-react";
+import { ChevronDown, Database, Download, FileDown, FileUp, Plus, Receipt, SearchX, Share2, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useExpenseDialogs } from "@/components/providers/ExpenseDialogProvider";
 import { useExpenses } from "@/components/providers/ExpenseProvider";
@@ -11,16 +10,13 @@ import { Card, Skeleton } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Menu } from "@/components/ui/Menu";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ExportComposer } from "@/components/cloud/ExportComposer";
 import { ExportSheet } from "@/components/export/ExportSheet";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
-import { ExportComposer } from "@/components/cloud/ExportComposer";
-import type { ExportScope } from "@/lib/export";
-import { formatCurrency } from "@/lib/format";
-import { generateSampleExpenses } from "@/lib/sampleData";
-import { CATEGORIES, type ExpenseFilters, type SortState } from "@/lib/types";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
+import type { ExportScope } from "@/lib/export";
 import { formatCurrency, formatDate, todayISO } from "@/lib/format";
-import type { ExpenseFilters, SortState } from "@/lib/types";
+import { CATEGORIES, type ExpenseFilters, type SortState } from "@/lib/types";
 import { ExpenseFiltersBar } from "./ExpenseFiltersBar";
 import { ExpenseList } from "./ExpenseList";
 
@@ -78,25 +74,15 @@ export function ExpensesView() {
     setVisibleCount(PAGE_SIZE);
   };
 
-  const [composerOpen, setComposerOpen] = useState(false);
-
-  const handleClearAll = () =>
-    confirm({
-      title: "Delete all expenses?",
-      message: `This permanently removes all ${expenses.length} expenses from this browser. Export a Full Backup first if you want to keep a copy.`,
-      confirmLabel: "Delete all",
-      onConfirm: () => {
-        clearAll();
-        toast("All expenses deleted.");
-      },
-    });
-
   const [exportOpen, setExportOpen] = useState(false);
-  // The export starts from the list's date and category filters; search text is a lookup aid, not a scope.
+  const [composerOpen, setComposerOpen] = useState(false);
+  // The export sheet starts from the list's date and category filters; search text is a lookup aid, not a scope.
   const exportScope: ExportScope = {
     startDate: filters.startDate,
     endDate: filters.endDate,
     categories: filters.category === "All" ? [...CATEGORIES] : [filters.category],
+  };
+
   const handleExport = () => {
     // An unfiltered export is a full backup; route it through exportAll so the backup status updates.
     if (visible.length === expenses.length) return exportAll();
@@ -124,13 +110,6 @@ export function ExpensesView() {
         actions={
           hasExpenses && (
             <>
-              <Button variant="ghost" onClick={handleClearAll}>
-                <Trash2 className="h-4 w-4" aria-hidden /> Delete all
-              </Button>
-              <Button variant="secondary" onClick={() => setComposerOpen(true)} aria-haspopup="dialog">
-                <Share2 className="h-4 w-4" aria-hidden /> Export &amp; share
-              <Button variant="secondary" onClick={() => setExportOpen(true)} aria-haspopup="dialog">
-                <Download className="h-4 w-4" aria-hidden /> Export…
               <Button variant="secondary" onClick={handleExport} disabled={visible.length === 0}>
                 <Download className="h-4 w-4" aria-hidden />
                 {isFiltered ? `Export ${visible.length.toLocaleString()} shown` : "Export CSV"}
@@ -147,6 +126,8 @@ export function ExpensesView() {
                 items={[
                   { label: "Import CSV…", icon: FileUp, onSelect: openImport },
                   { label: "Export all expenses", icon: FileDown, onSelect: exportAll },
+                  { label: "Export with options…", icon: SlidersHorizontal, onSelect: () => setExportOpen(true) },
+                  { label: "Export & share…", icon: Share2, onSelect: () => setComposerOpen(true) },
                   "separator",
                   { label: "Delete all expenses…", icon: Trash2, danger: true, onSelect: requestDeleteAll },
                 ]}
@@ -217,8 +198,8 @@ export function ExpensesView() {
         )}
       </Card>
 
-      <ExportComposer open={composerOpen} onClose={() => setComposerOpen(false)} preset={{}} />
       <ExportSheet open={exportOpen} onClose={() => setExportOpen(false)} initialScope={exportScope} />
+      <ExportComposer open={composerOpen} onClose={() => setComposerOpen(false)} preset={{}} />
     </>
   );
 }

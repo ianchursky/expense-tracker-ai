@@ -15,6 +15,9 @@ const LINKS = [
   { href: "/exports", label: "Exports", icon: Share2 },
 ];
 
+// The tab bar puts the raised Add button after this many links.
+const TABS_BEFORE_ADD = 2;
+
 function useActive() {
   const pathname = usePathname();
   return (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
@@ -59,37 +62,30 @@ export function Navbar() {
                   active ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                 )}
               >
-                <Icon className="h-4 w-4" aria-hidden />
-                <span className="sr-only sm:not-sr-only">{label}</span>
                 <Icon className={clsx("h-4 w-4", active ? "text-brand-600" : "text-slate-500")} aria-hidden />
                 {label}
               </Link>
             );
           })}
         </nav>
-        <div className="mt-auto">
+        <div className="mt-auto space-y-3">
+          <SyncIndicator variant="nav" />
           <StorageStatus variant="sidebar" />
         </div>
       </aside>
 
+      <header className="sticky top-0 z-40 flex h-14 items-center border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:hidden">
+        <Wordmark />
         <div className="ml-auto">
           <SyncIndicator variant="nav" />
         </div>
-        <Button onClick={openAdd} aria-label="Add expense">
-          <Plus className="h-4 w-4" aria-hidden />
-          <span className="hidden sm:inline">Add expense</span>
-        </Button>
-      </div>
-    </header>
-      <header className="sticky top-0 z-40 flex h-14 items-center border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:hidden">
-        <Wordmark />
       </header>
 
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
-        {LINKS.slice(0, 1).map(({ href, label, icon: Icon }) => (
+        {LINKS.slice(0, TABS_BEFORE_ADD).map(({ href, label, icon: Icon }) => (
           <TabLink key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
         <div className="flex items-center justify-center">
@@ -102,7 +98,7 @@ export function Navbar() {
             <Plus className="h-6 w-6" aria-hidden />
           </button>
         </div>
-        {LINKS.slice(1).map(({ href, label, icon: Icon }) => (
+        {LINKS.slice(TABS_BEFORE_ADD).map(({ href, label, icon: Icon }) => (
           <TabLink key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
       </nav>

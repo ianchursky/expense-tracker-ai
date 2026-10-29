@@ -91,7 +91,7 @@ export function JobTray() {
   return (
     <section
       aria-label="Background exports"
-      className="fixed bottom-4 left-4 right-4 z-50 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl sm:right-auto sm:w-80"
+      className="fixed bottom-24 left-4 right-4 z-50 lg:bottom-4 lg:left-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl sm:right-auto sm:w-80"
     >
       <header className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
         <p className="flex-1 text-sm font-semibold text-slate-900" aria-live="polite">
