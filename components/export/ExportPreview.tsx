@@ -65,7 +65,7 @@ export function ExportPreview({ selection, onReset }: { selection: ExportSelecti
             {byCategory.map((c) => (
               <li key={c.category} className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CATEGORY_META[c.category].color }} aria-hidden />
-                {c.category} <span className="tabular-nums text-slate-500">{c.percent.toFixed(0)}%</span>
+                {CATEGORY_META[c.category].label} <span className="tabular-nums text-slate-500">{c.percent.toFixed(0)}%</span>
               </li>
             ))}
           </ul>

@@ -11,6 +11,7 @@ import { DESTINATIONS, getDestination } from "@/lib/cloud/destinations";
 import { TEMPLATES, defaultPeriod, describePeriod, getTemplate } from "@/lib/cloud/templates";
 import { filenameFor } from "@/lib/cloud/serialize";
 import type { DestinationDetails, DestinationId, FileFormat, Period, TemplateId, TemplateOutput } from "@/lib/cloud/types";
+import { categoryLabel } from "@/lib/categories";
 import { formatMonthKey, monthKey, todayISO } from "@/lib/format";
 import { DemoBadge } from "./DemoBadge";
 import { useCloud } from "./CloudProvider";
@@ -365,6 +366,7 @@ function ComposerBody({ onClose, preset }: { onClose: () => void; preset: Compos
 
 /** Money columns show cents and thousands separators on screen; the exported file keeps raw numbers. */
 function displayCell(cell: string | number, column: string) {
+  if (typeof cell === "string" && column === "Category") return categoryLabel(cell);
   return typeof cell === "number" && column.includes("USD")
     ? cell.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : cell;
@@ -377,7 +379,7 @@ export function ReportPreview({ output, limit = 5 }: { output: TemplateOutput; l
         {output.highlights.map((h) => (
           <div key={h.label}>
             <p className="text-xs text-slate-500">{h.label}</p>
-            <p className="text-sm font-semibold text-slate-900 tabular-nums">{h.value}</p>
+            <p className="text-sm font-semibold text-slate-900 tabular-nums">{categoryLabel(h.value)}</p>
           </div>
         ))}
       </div>

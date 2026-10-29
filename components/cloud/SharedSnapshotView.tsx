@@ -4,6 +4,7 @@ import { Clock, Eye, LinkIcon, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Card, Skeleton } from "@/components/ui/Card";
+import { categoryLabel } from "@/lib/categories";
 import { decodeSnapshot, type ShareSnapshot } from "@/lib/cloud/share";
 
 type State = { status: "loading" } | { status: "error"; message: string } | { status: "expired"; snapshot: ShareSnapshot } | { status: "ready"; snapshot: ShareSnapshot };
@@ -74,7 +75,7 @@ export function SharedSnapshotView() {
           {snapshot.highlights.map((h) => (
             <div key={h.label}>
               <dt className="text-xs font-medium text-slate-500">{h.label}</dt>
-              <dd className="mt-0.5 text-lg font-semibold text-slate-900 tabular-nums">{h.value}</dd>
+              <dd className="mt-0.5 text-lg font-semibold text-slate-900 tabular-nums">{categoryLabel(h.value)}</dd>
             </div>
           ))}
         </dl>
@@ -96,7 +97,9 @@ export function SharedSnapshotView() {
                     <td key={j} className={typeof cell === "number" ? "px-5 py-2.5 text-right tabular-nums text-slate-900" : "px-5 py-2.5 text-slate-700"}>
                       {typeof cell === "number" && snapshot.columns[j].includes("USD")
                         ? cell.toLocaleString("en-US", { style: "currency", currency: "USD" })
-                        : cell}
+                        : snapshot.columns[j] === "Category"
+                          ? categoryLabel(String(cell))
+                          : cell}
                     </td>
                   ))}
                 </tr>

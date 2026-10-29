@@ -144,7 +144,7 @@ export function ExpenseForm({ initial, onSubmit, onCancel, onDelete }: ExpenseFo
           className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3"
         >
           {CATEGORIES.map((category, index) => {
-            const { icon: Icon, iconClass } = CATEGORY_META[category];
+            const { icon: Icon, iconClass, label } = CATEGORY_META[category];
             const selected = values.category === category;
             return (
               <label
@@ -175,7 +175,7 @@ export function ExpenseForm({ initial, onSubmit, onCancel, onDelete }: ExpenseFo
                 <span className={clsx("flex h-6 w-6 items-center justify-center rounded-md", iconClass)}>
                   <Icon className="h-3.5 w-3.5" aria-hidden />
                 </span>
-                {category}
+                {label}
               </label>
             );
           })}

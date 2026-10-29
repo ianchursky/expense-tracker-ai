@@ -228,7 +228,7 @@ export function ExportOptionsPanel({ draft, expenses, disabled }: ExportOptionsP
                     className="h-4 w-4 rounded border-slate-300 text-brand-600 accent-brand-600"
                   />
                   <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_META[category].color }} aria-hidden />
-                  <span className={clsx("flex-1 font-medium", checked ? "text-slate-900" : "text-slate-500")}>{category}</span>
+                  <span className={clsx("flex-1 font-medium", checked ? "text-slate-900" : "text-slate-500")}>{CATEGORY_META[category].label}</span>
                   <span className="text-xs text-slate-500 tabular-nums">
                     {c ? `${c.count} · ${formatCurrency(c.total)}` : "none in range"}
                   </span>

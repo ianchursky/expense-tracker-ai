@@ -72,7 +72,7 @@ export function SummaryCards({ summary }: { summary: DashboardSummary }) {
                 style={{ backgroundColor: CATEGORY_META[topCategory.category].color }}
                 aria-hidden
               />
-              {topCategory.category}
+              {CATEGORY_META[topCategory.category].label}
             </span>
           ) : (
             "—"

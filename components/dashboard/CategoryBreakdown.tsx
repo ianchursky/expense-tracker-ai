@@ -13,7 +13,7 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
   const item = payload[0].payload as CategoryTotal;
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-popover">
-      <p className="font-medium text-slate-900">{item.category}</p>
+      <p className="font-medium text-slate-900">{CATEGORY_META[item.category].label}</p>
       <p className="text-slate-600 tabular-nums">
         {formatCurrency(item.total)} · {item.percent.toFixed(1)}%
       </p>
@@ -75,7 +75,7 @@ export function CategoryBreakdown({
                     style={{ backgroundColor: CATEGORY_META[d.category].color }}
                     aria-hidden
                   />
-                  <span className="truncate">{d.category}</span>
+                  <span className="truncate">{CATEGORY_META[d.category].label}</span>
                 </span>
                 <span className="shrink-0 tabular-nums">
                   <span className="font-medium text-slate-900">{formatCurrency(d.total)}</span>

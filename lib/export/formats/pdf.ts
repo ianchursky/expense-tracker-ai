@@ -1,3 +1,4 @@
+import { CATEGORY_META } from "../../categories";
 import { CATEGORIES } from "../../types";
 import { formatCurrency, formatDate } from "../../format";
 import type { ExportContext, ExportFormat, FormatSettings } from "../types";
@@ -30,7 +31,7 @@ function describeScope({ scope }: ExportContext): { range: string; categories: s
           ? `Through ${formatDate(endDate)}`
           : "All dates";
   const categories =
-    scope.categories.length === CATEGORIES.length ? "All categories" : scope.categories.join(", ");
+    scope.categories.length === CATEGORIES.length ? "All categories" : scope.categories.map((c) => CATEGORY_META[c].label).join(", ");
   return { range, categories };
 }
 
@@ -102,7 +103,7 @@ async function buildPdf(context: ExportContext, settings: FormatSettings["pdf"])
       ...tableTheme,
       startY: y + 8,
       head: [["Category", "Records", "Amount", "Share"]],
-      body: selection.byCategory.map((c) => [c.category, String(c.count), formatCurrency(c.total), `${c.percent.toFixed(1)}%`]),
+      body: selection.byCategory.map((c) => [CATEGORY_META[c.category].label, String(c.count), formatCurrency(c.total), `${c.percent.toFixed(1)}%`]),
       columnStyles: { 1: { halign: "right" }, 2: { halign: "right" }, 3: { halign: "right" } },
       tableWidth: Math.min(360, pageWidth - MARGIN * 2),
     });
@@ -114,9 +115,9 @@ async function buildPdf(context: ExportContext, settings: FormatSettings["pdf"])
     ...tableTheme,
     startY: y + 8,
     head: [["Date", "Description", "Category", "Amount"]],
-    body: selection.records.map((e) => [formatDate(e.date), toPdfText(e.description), e.category, formatCurrency(e.amount)]),
+    body: selection.records.map((e) => [formatDate(e.date), toPdfText(e.description), CATEGORY_META[e.category].label, formatCurrency(e.amount)]),
     foot: [["", `${count.toLocaleString("en-US")} record${count === 1 ? "" : "s"}`, "Total", formatCurrency(selection.total)]],
-    columnStyles: { 0: { cellWidth: 80 }, 2: { cellWidth: 100 }, 3: { halign: "right", cellWidth: 80 } },
+    columnStyles: { 0: { cellWidth: 80 }, 2: { cellWidth: 125 }, 3: { halign: "right", cellWidth: 80 } },
     showFoot: "lastPage",
   });
 

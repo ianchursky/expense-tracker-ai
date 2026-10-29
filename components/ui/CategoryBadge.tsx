@@ -10,7 +10,7 @@ export function CategoryBadge({ category }: { category: Category }) {
         CATEGORY_META[category].badgeClass,
       )}
     >
-      {category}
+      {CATEGORY_META[category].label}
     </span>
   );
 }

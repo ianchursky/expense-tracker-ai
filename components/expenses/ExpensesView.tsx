@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { ExportComposer } from "@/components/cloud/ExportComposer";
 import { ExportSheet } from "@/components/export/ExportSheet";
 import { DEFAULT_FILTERS, filterExpenses, sortExpenses, sumAmounts } from "@/lib/analytics";
+import { CATEGORY_META } from "@/lib/categories";
 import { downloadCSV, expensesToCSV } from "@/lib/csv";
 import type { ExportScope } from "@/lib/export";
 import { formatCurrency, formatDate, todayISO } from "@/lib/format";
@@ -35,7 +36,7 @@ function ListSkeleton() {
 /** Empty-results copy that repeats back exactly what was searched, so the next step is obvious. */
 function describeNoResults(filters: ExpenseFilters): { title: string; description: string } {
   const query = filters.search.trim();
-  const what = filters.category === "All" ? "all expenses" : `${filters.category} expenses`;
+  const what = filters.category === "All" ? "all expenses" : `${CATEGORY_META[filters.category].label} expenses`;
   const { startDate, endDate } = filters;
   const when =
     startDate && endDate

@@ -78,7 +78,7 @@ function MobileRow({ expense: e }: { expense: Expense }) {
             style={{ backgroundColor: CATEGORY_META[e.category].color }}
             aria-hidden
           />
-          {e.category} · {formatDate(e.date)}
+          {CATEGORY_META[e.category].label} · {formatDate(e.date)}
         </p>
       </div>
       <span className="shrink-0 text-sm font-semibold text-slate-900 tabular-nums">{formatCurrency(e.amount)}</span>

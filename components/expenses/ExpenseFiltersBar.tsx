@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { Search, X } from "lucide-react";
 import { useId } from "react";
 import { DATE_PRESETS, DEFAULT_FILTERS, presetRange } from "@/lib/analytics";
+import { CATEGORY_META } from "@/lib/categories";
 import { CATEGORIES, type Category, type ExpenseFilters } from "@/lib/types";
 
 interface ExpenseFiltersBarProps {
@@ -64,7 +65,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
             <option value="All">All categories</option>
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {CATEGORY_META[c].label}
               </option>
             ))}
           </select>
