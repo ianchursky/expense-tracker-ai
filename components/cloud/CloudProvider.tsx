@@ -189,7 +189,7 @@ export function CloudProvider({ children }: { children: ReactNode }) {
           toast(`${filename} downloaded.`);
         } else if (destination.id === "share-link") {
           const snapshot = snapshotFrom(output, request.details.expiresInDays ?? null);
-          const url = shareUrl(window.location.origin, await encodeSnapshot(snapshot));
+          const url = shareUrl(window.location.origin + (process.env.NEXT_PUBLIC_BASE_PATH || ""), await encodeSnapshot(snapshot));
           const expires = snapshot.expiresAt
             ? `expires ${new Date(snapshot.expiresAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
             : "never expires";

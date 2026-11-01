@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "next build && node scripts/zip-out.mjs",
+    "build:cloudflare": "next build && node scripts/flatten-rsc.mjs && node scripts/zip-out.mjs",
     "start": "next start",
     "lint": "eslint app components lib",
     "typecheck": "tsc --noEmit"
