@@ -26,3 +26,6 @@ next-env.d.ts
 .impeccable/config.local.json
 .impeccable/hook.cache.json
 .impeccable/review/
+
+# Cloudflare Pages upload (npm run build:cloudflare)
+/expense-tracker-cloudflare.zip

@@ -9,7 +9,8 @@ Requires Node 18.17+ (`.nvmrc` pins 20). Next.js 14 will not run on older Node.
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm run build      # production build (also type-checks and lints)
+npm run build      # production build (type-checks; Next 16 no longer lints during build)
+npm run build:cloudflare  # static export to out/, zipped to expense-tracker-cloudflare.zip for Cloudflare Pages drag-and-drop
 npm run lint       # eslint (next/core-web-vitals); Next 16 removed `next lint`
 npm run typecheck  # tsc --noEmit
 ```
